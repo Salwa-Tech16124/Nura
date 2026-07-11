@@ -30,20 +30,18 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
       onTap: () => _selectLanguage(lang, context),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white.withAlpha(8),
+          color: isSelected ? const Color(0xFFC3F3C0) : Colors.white, // Green active, white inactive
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? const Color(0xFFD84315) : Colors.white.withAlpha(10),
-            width: 2,
+            color: Colors.black,
+            width: isSelected ? 2.2 : 1.8,
           ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: const Color(0xFFD84315).withAlpha(40),
-                    blurRadius: 15,
-                  ),
-                ]
-              : null,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black,
+              offset: isSelected ? const Offset(2, 4) : const Offset(1, 2),
+            ),
+          ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -52,11 +50,11 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
             const SizedBox(height: AppSpacing.sm),
             Text(
               lang,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16),
+              style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: 16),
             ),
             Text(
               sub,
-              style: const TextStyle(color: Colors.white54, fontWeight: FontWeight.bold, fontSize: 12),
+              style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.bold, fontSize: 12),
             ),
           ],
         ),
@@ -67,12 +65,12 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0B09), // Dark brown-black background
+      backgroundColor: const Color(0xFFE8F1F5), // Light sky-blue background
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white70),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
           onPressed: () => context.pop(),
         ),
       ),
@@ -85,11 +83,11 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
               const SizedBox(height: AppSpacing.md),
               const Text(
                 'Choose Your',
-                style: TextStyle(color: Colors.white54, fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(color: Colors.black54, fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const Text(
                 'Language',
-                style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900),
+                style: TextStyle(color: Color(0xFF1E244A), fontSize: 32, fontWeight: FontWeight.w900),
               ),
               const SizedBox(height: AppSpacing.xxl),
               
@@ -102,7 +100,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                   children: [
                     _buildCard('🇺🇸', 'English', '(US)', context),
                     _buildCard('🇲🇽', 'Español', 'Mexico', context),
-                    _buildCard('🇲🇽', 'Español', 'Mexico', context), // Using Mexico as per image
+                    _buildCard('🇲🇽', 'Español', 'Mexico', context), 
                     _buildCard('🇫🇷', 'Français', 'France', context),
                     _buildCard('🇨🇳', '中文', 'Mandarin', context),
                     _buildCard('🇮🇳', 'हिन्दी', 'Hindi', context),
