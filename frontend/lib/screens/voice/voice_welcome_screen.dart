@@ -313,7 +313,7 @@ class SpeechBubblePainter extends CustomPainter {
 }
 
 // ------------------------------------------------------------
-// ANIMATED ROBOT WITH COMPREHENSIVE ACTIONS
+// ANIMATED ROBOT WITH COMPREHENSIVE ACTIONS (Natural behavior loop)
 // ------------------------------------------------------------
 class AnimatedRobot extends StatefulWidget {
   final ValueNotifier<RobotTrigger?> triggerNotifier;
@@ -328,28 +328,38 @@ class AnimatedRobot extends StatefulWidget {
 }
 
 class _AnimatedRobotState extends State<AnimatedRobot> with TickerProviderStateMixin {
-  // Animation controllers for premium 3D movement
+  // Animation controllers for premium 3D movement and core glow
   late final AnimationController _hoverController;
-  late final AnimationController _waveController;
-  late final AnimationController _danceController;
-  late final AnimationController _blinkController;
   late final AnimationController _pulseController;
+  late final AnimationController _blinkController;
 
   late final Animation<double> _hoverAnimation;
-  late final Animation<double> _waveAnimation;
-  late final Animation<double> _danceAnimation;
   late final Animation<double> _pulseAnimation;
 
-  // Robot States
+  // Active state parameters driven by state machine with automatic TweenAnimationBuilder transitions
   RobotState _currentState = RobotState.greeting;
   EyeExpression _eyeExpression = EyeExpression.normal;
   bool _glowExtra = false;
   int _messageIndex = 0;
+  int _lastActionIndex = -1;
+
+  // Physical target values for custom painter inputs
+  double _rightArmAngle = 0.2;
+  double _leftArmAngle = -0.2;
+  double _bodyTilt = 0.0;
+  double _headTilt = 0.0;
+  double _eyeOffsetX = 0.0;
+  double _eyeOffsetY = 0.0;
+  double _headOffsetY = 0.0;
+  double _eyeScale = 1.0;
 
   // Speech bubble variables
   String _bubbleText = "Namaste! 🙏";
-  Timer? _activityTimer;
+  Timer? _loopTimer;
+  Timer? _blinkTimer;
   Timer? _rotationTimer;
+  bool _isBlinking = false;
+  bool _isBusy = false; // Disables idle randomizer during active greeting or talk states
 
   // List of speech bubble messages to rotate
   final List<String> _idleMessages = [
@@ -373,38 +383,14 @@ class _AnimatedRobotState extends State<AnimatedRobot> with TickerProviderStateM
     // 1. Idle Floating Animation (hover)
     _hoverController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2400),
+      duration: const Duration(milliseconds: 2600),
     );
-    _hoverAnimation = Tween<double>(begin: 0.0, end: -7.0).animate(
+    _hoverAnimation = Tween<double>(begin: 0.0, end: -5.0).animate(
       CurvedAnimation(parent: _hoverController, curve: Curves.easeInOut),
     );
     _hoverController.repeat(reverse: true);
 
-    // 2. Arm Waving Animation
-    _waveController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 450),
-    );
-    _waveAnimation = Tween<double>(begin: -0.2, end: 0.8).animate(
-      CurvedAnimation(parent: _waveController, curve: Curves.easeInOut),
-    );
-
-    // 3. Torso Dancing Tilt Animation
-    _danceController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 400),
-    );
-    _danceAnimation = Tween<double>(begin: -0.12, end: 0.12).animate(
-      CurvedAnimation(parent: _danceController, curve: Curves.easeInOut),
-    );
-
-    // 4. Eye Blink Controller
-    _blinkController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 200),
-    );
-
-    // 5. Chest pulse glow animation
+    // 2. Chest pulse glow animation
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1400),
@@ -413,6 +399,15 @@ class _AnimatedRobotState extends State<AnimatedRobot> with TickerProviderStateM
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
     _pulseController.repeat(reverse: true);
+
+    // 3. Eye Blink Controller
+    _blinkController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 150),
+    );
+
+    // Setup periodic blink timer (blinks every 3.5 - 5 seconds randomly)
+    _startBlinkTimer();
 
     // Listen to parent triggers
     widget.triggerNotifier.addListener(_handleTrigger);
@@ -425,13 +420,35 @@ class _AnimatedRobotState extends State<AnimatedRobot> with TickerProviderStateM
   void dispose() {
     widget.triggerNotifier.removeListener(_handleTrigger);
     _hoverController.dispose();
-    _waveController.dispose();
-    _danceController.dispose();
-    _blinkController.dispose();
     _pulseController.dispose();
-    _activityTimer?.cancel();
+    _blinkController.dispose();
+    _loopTimer?.cancel();
+    _blinkTimer?.cancel();
     _rotationTimer?.cancel();
     super.dispose();
+  }
+
+  // ------------------------------------------------------------
+  // RANDOM EYE BLINKING
+  // ------------------------------------------------------------
+  void _startBlinkTimer() {
+    _blinkTimer?.cancel();
+    final randomSecs = 3 + math.Random().nextInt(3);
+    _blinkTimer = Timer(Duration(seconds: randomSecs), () {
+      if (mounted && _currentState != RobotState.actionTransition) {
+        setState(() => _isBlinking = true);
+        _blinkController.forward().then((_) {
+          _blinkController.reverse().then((_) {
+            if (mounted) {
+              setState(() => _isBlinking = false);
+              _startBlinkTimer();
+            }
+          });
+        });
+      } else {
+        _startBlinkTimer();
+      }
+    });
   }
 
   // ------------------------------------------------------------
@@ -441,273 +458,590 @@ class _AnimatedRobotState extends State<AnimatedRobot> with TickerProviderStateM
     final trigger = widget.triggerNotifier.value;
     if (trigger == null) return;
 
-    _activityTimer?.cancel();
+    _loopTimer?.cancel();
     _rotationTimer?.cancel();
-    _waveController.stop();
-    _danceController.stop();
+    setState(() {
+      _isBusy = true;
+    });
 
     if (trigger == RobotTrigger.pointToSuggestions) {
-      setState(() {
-        _currentState = RobotState.pointing;
-        _eyeExpression = EyeExpression.wink;
-        _bubbleText = "You can ask me anything.";
-      });
-      // Lift arm to point at suggestion cards
-      _waveController.animateTo(0.9, duration: const Duration(milliseconds: 300));
-      
-      _activityTimer = Timer(const Duration(milliseconds: 1600), _startIdleRotation);
+      _currentState = RobotState.pointing;
+      _triggerPointingPose();
     } 
     else if (trigger == RobotTrigger.startVoiceConversation) {
-      setState(() {
-        _currentState = RobotState.actionTransition;
-        _eyeExpression = EyeExpression.excited;
-        _bubbleText = "Let's talk 🎤";
-        _glowExtra = true;
-      });
-      _waveController.repeat(reverse: true, period: const Duration(milliseconds: 250));
+      _currentState = RobotState.actionTransition;
+      _triggerVoiceConversationPose();
     }
 
     widget.triggerNotifier.value = null;
   }
 
   // ------------------------------------------------------------
-  // GREETING SEQUENCE (On Load)
+  // SPECIFIC ACTION POSES
+  // ------------------------------------------------------------
+  void _triggerPointingPose() {
+    setState(() {
+      _rightArmAngle = -1.25; // Point left
+      _leftArmAngle = -0.2;
+      _bodyTilt = -0.05;
+      _headTilt = -0.08; // Look left towards cards
+      _eyeOffsetX = -2.5; // Pupils look left
+      _eyeOffsetY = 0.0;
+      _eyeExpression = EyeExpression.wink;
+      _bubbleText = "You can ask me anything.";
+    });
+
+    // Hold pointing for 1.5 seconds then release back to normal idle loop
+    _loopTimer = Timer(const Duration(milliseconds: 1500), () {
+      setState(() {
+        _isBusy = false;
+        _returnToIdlePose();
+      });
+      _startNaturalLoop();
+      _startSpeechRotation();
+    });
+  }
+
+  void _triggerVoiceConversationPose() {
+    setState(() {
+      _rightArmAngle = -1.0;
+      _leftArmAngle = -0.3;
+      _bodyTilt = 0.05;
+      _headTilt = 0.05;
+      _eyeOffsetX = 0.0;
+      _eyeOffsetY = 0.0;
+      _eyeExpression = EyeExpression.excited;
+      _bubbleText = "Let's talk 🎤";
+      _glowExtra = true;
+      _eyeScale = 1.25;
+    });
+    // Wave hand fast
+    _animateWave(waves: 4);
+  }
+
+  // Helper to execute wave oscillations
+  Future<void> _animateWave({required int waves}) async {
+    for (int i = 0; i < waves; i++) {
+      if (!mounted) break;
+      setState(() {
+        _rightArmAngle = i % 2 == 0 ? -1.15 : -0.75;
+      });
+      await Future.delayed(const Duration(milliseconds: 200));
+    }
+  }
+
+  // Helper to execute clap oscillations
+  Future<void> _animateClap({required int claps}) async {
+    for (int i = 0; i < claps; i++) {
+      if (!mounted) break;
+      setState(() {
+        _rightArmAngle = i % 2 == 0 ? -0.2 : -0.55;
+        _leftArmAngle = i % 2 == 0 ? 0.2 : 0.55;
+      });
+      await Future.delayed(const Duration(milliseconds: 180));
+    }
+  }
+
+  // Helper to execute wiggle/dance oscillations
+  Future<void> _animateDance({required int steps}) async {
+    for (int i = 0; i < steps; i++) {
+      if (!mounted) break;
+      setState(() {
+        _bodyTilt = i % 2 == 0 ? 0.12 : -0.12;
+        _rightArmAngle = i % 2 == 0 ? 0.35 : -0.35;
+        _leftArmAngle = i % 2 == 0 ? -0.35 : 0.35;
+      });
+      await Future.delayed(const Duration(milliseconds: 250));
+    }
+  }
+
+  // ------------------------------------------------------------
+  // GREETING SEQUENCE (On Screen Load)
   // ------------------------------------------------------------
   Future<void> _runGreetingSequence() async {
-    // 1. Waves and says Namaste!
     setState(() {
+      _isBusy = true;
       _currentState = RobotState.greeting;
       _eyeExpression = EyeExpression.smile;
       _bubbleText = "Namaste 🙏";
     });
-    _waveController.repeat(reverse: true);
-
-    await Future.delayed(const Duration(milliseconds: 1600));
+    
+    // Wave hand naturally on entry
+    await _animateWave(waves: 5);
     if (!mounted || _currentState == RobotState.actionTransition) return;
 
-    // 2. Looks at user and says Hello John 👋
+    // Small bow & Hello John
     setState(() {
       _eyeExpression = EyeExpression.normal;
       _bubbleText = "Hello John 👋";
+      _headOffsetY = 2.0; // Bow head
+      _headTilt = 0.08;
+      _rightArmAngle = -0.3; // Hand on chest
+      _leftArmAngle = -0.2;
     });
-    _waveController.animateTo(0.2, duration: const Duration(milliseconds: 300));
+
+    await Future.delayed(const Duration(milliseconds: 1500));
+    if (!mounted || _currentState == RobotState.actionTransition) return;
+
+    // I'm NURA
+    setState(() {
+      _headOffsetY = 0.0;
+      _headTilt = 0.0;
+      _eyeExpression = EyeExpression.smile;
+      _bubbleText = "I'm NURA";
+      _rightArmAngle = 0.2;
+    });
 
     await Future.delayed(const Duration(milliseconds: 1600));
     if (!mounted || _currentState == RobotState.actionTransition) return;
 
-    // 3. I'm NURA AI Health Copilot
     setState(() {
-      _eyeExpression = EyeExpression.smile;
-      _bubbleText = "I'm NURA";
+      _isBusy = false;
     });
-
-    await Future.delayed(const Duration(milliseconds: 1800));
-    _startIdleRotation();
+    _startNaturalLoop();
+    _startSpeechRotation();
   }
 
-  // ------------------------------------------------------------
-  // IDLE ROTATION MANAGEMENT
-  // ------------------------------------------------------------
-  void _startIdleRotation() {
-    if (!mounted || _currentState == RobotState.actionTransition) return;
-
-    _activityTimer?.cancel();
+  void _startSpeechRotation() {
     _rotationTimer?.cancel();
+    _rotationTimer = Timer.periodic(const Duration(milliseconds: 5500), (timer) {
+      if (!mounted || _currentState == RobotState.actionTransition || _isBusy) return;
 
-    _enterIdleState();
-
-    // Rotate bubble messages and animations every 4.5 seconds
-    _rotationTimer = Timer.periodic(const Duration(milliseconds: 4500), (timer) {
-      if (!mounted || _currentState == RobotState.actionTransition) {
-        timer.cancel();
-        return;
-      }
-      
       _messageIndex = (_messageIndex + 1) % _idleMessages.length;
-      final nextMessage = _idleMessages[_messageIndex];
-
+      final newMessage = _idleMessages[_messageIndex];
       setState(() {
-        _bubbleText = nextMessage;
+        _bubbleText = newMessage;
       });
-
-      _triggerActivityForMessage(nextMessage);
+      _onMessageChanged(newMessage);
     });
   }
 
-  void _enterIdleState() {
+  // ------------------------------------------------------------
+  // NATURAL BEHAVIOR LOOP (Duolingo-like randomized flow)
+  // ------------------------------------------------------------
+  void _startNaturalLoop() {
+    _loopTimer?.cancel();
+
+    // Random timing: pause between animations (3 to 6 seconds)
+    final randomSecs = 3.0 + (math.Random().nextDouble() * 3.0);
+    _loopTimer = Timer(Duration(milliseconds: (randomSecs * 1000).toInt()), () {
+      if (!mounted || _currentState == RobotState.actionTransition || _isBusy) return;
+
+      _executeRandomAction();
+    });
+  }
+
+  Future<void> _executeRandomAction() async {
+    if (!mounted || _currentState == RobotState.actionTransition || _isBusy) return;
+
+    final random = math.Random();
+    
+    // Define 10 distinct personality actions
+    // Ensure we do not pick the same action twice consecutively
+    int actionIndex;
+    do {
+      actionIndex = random.nextInt(10);
+    } while (actionIndex == _lastActionIndex);
+    _lastActionIndex = actionIndex;
+
     setState(() {
-      _currentState = RobotState.idle;
-      _eyeExpression = EyeExpression.normal;
-      _glowExtra = false;
+      _isBusy = true;
     });
-    _waveController.stop();
-    _danceController.stop();
-  }
 
-  void _triggerActivityForMessage(String message) {
+    switch (actionIndex) {
+      case 0: // 👀 Look Left
+        setState(() {
+          _eyeOffsetX = -2.5;
+          _headTilt = -0.08;
+          _rightArmAngle = 0.3;
+        });
+        await Future.delayed(const Duration(milliseconds: 1500));
+        break;
+
+      case 1: // 👀 Look Right
+        setState(() {
+          _eyeOffsetX = 2.5;
+          _headTilt = 0.08;
+          _leftArmAngle = -0.3;
+        });
+        await Future.delayed(const Duration(milliseconds: 1500));
+        break;
+
+      case 2: // 😉 Blink & Wink
+        setState(() {
+          _eyeExpression = EyeExpression.wink;
+          _headTilt = 0.06;
+        });
+        await Future.delayed(const Duration(milliseconds: 1200));
+        break;
+
+      case 3: // 🤖 Head Tilt
+        setState(() {
+          _headTilt = -0.15;
+          _eyeOffsetY = -1.0;
+        });
+        await Future.delayed(const Duration(milliseconds: 1400));
+        break;
+
+      case 4: // 👋 Small Wave
+        setState(() {
+          _eyeExpression = EyeExpression.smile;
+        });
+        await _animateWave(waves: 4);
+        break;
+
+      case 5: // ✨ Tiny Jump & Celebration
+        setState(() {
+          _eyeExpression = EyeExpression.excited;
+          _headOffsetY = -5.0; // Leap
+        });
+        await Future.delayed(const Duration(milliseconds: 250));
+        setState(() {
+          _headOffsetY = 2.0; // Landing squash
+        });
+        await Future.delayed(const Duration(milliseconds: 200));
+        setState(() {
+          _headOffsetY = 0.0; // Stabilize
+        });
+        break;
+
+      case 6: // 💃 Happy Dance (2 seconds)
+        setState(() {
+          _eyeExpression = EyeExpression.excited;
+        });
+        await _animateDance(steps: 6);
+        break;
+
+      case 7: // 🫶 Namaste
+        setState(() {
+          _eyeExpression = EyeExpression.smile;
+          _rightArmAngle = -0.85;
+          _leftArmAngle = 0.85;
+        });
+        await Future.delayed(const Duration(milliseconds: 1600));
+        break;
+
+      case 8: // 🤔 Think / Ponder
+        setState(() {
+          _eyeExpression = EyeExpression.thinking;
+          _rightArmAngle = -0.85; // chin touch
+          _eyeOffsetY = -2.0; // look up
+          _headTilt = 0.1;
+        });
+        await Future.delayed(const Duration(milliseconds: 1800));
+        break;
+
+      case 9: // 👏 Clap
+        setState(() {
+          _eyeExpression = EyeExpression.smile;
+        });
+        await _animateClap(claps: 5);
+        break;
+    }
+
     if (!mounted || _currentState == RobotState.actionTransition) return;
 
-    _waveController.stop();
-    _danceController.stop();
+    // Return to natural idle and start the timer for the next action
+    setState(() {
+      _returnToIdlePose();
+      _isBusy = false;
+    });
 
-    if (message.contains("Namaste")) {
-      setState(() {
-        _currentState = RobotState.heart;
-        _eyeExpression = EyeExpression.smile;
-      });
-      // Fold arms up
-      _waveController.animateTo(0.7, duration: const Duration(milliseconds: 400));
-      // Bounce jump
-      _hoverController.duration = const Duration(milliseconds: 300);
-      _hoverController.forward().then((_) => _hoverController.reverse().then((_) {
-        _hoverController.duration = const Duration(milliseconds: 2400);
-        _hoverController.repeat(reverse: true);
-      }));
-    } 
-    else if (message.contains("talk") || message.contains("Copilot")) {
-      setState(() {
-        _currentState = RobotState.talking;
-        _eyeExpression = EyeExpression.wink; // Listening wink
-      });
-      // Soft nod head by animating head tilt
-      _hoverController.duration = const Duration(milliseconds: 1200);
-    } 
-    else if (message.contains("medicines") || message.contains("review")) {
-      setState(() {
-        _currentState = RobotState.thinking;
-        _eyeExpression = EyeExpression.thinking;
-      });
-      // Hand on chin
-      _waveController.animateTo(0.65, duration: const Duration(milliseconds: 400));
-    } 
-    else if (message.contains("feeling") || message.contains("health")) {
-      setState(() {
-        _currentState = RobotState.heart;
-        _eyeExpression = EyeExpression.excited; // Heart/Caring expression
-      });
-      _waveController.animateTo(0.5, duration: const Duration(milliseconds: 300));
-    } 
-    else if (message.contains("Everything") || message.contains("Welcome")) {
-      setState(() {
-        _currentState = RobotState.dancing;
-        _eyeExpression = EyeExpression.smile;
-      });
-      _danceController.repeat(reverse: true);
-      _waveController.repeat(reverse: true, period: const Duration(milliseconds: 600));
-    } 
-    else {
-      _enterIdleState();
+    _startNaturalLoop();
+  }
+
+  void _returnToIdlePose() {
+    _rightArmAngle = 0.2;
+    _leftArmAngle = -0.2;
+    _bodyTilt = 0.0;
+    _headTilt = 0.0;
+    _eyeOffsetX = 0.0;
+    _eyeOffsetY = 0.0;
+    _headOffsetY = 0.0;
+    _eyeScale = 1.0;
+    _eyeExpression = EyeExpression.normal;
+    _glowExtra = false;
+  }
+
+  // ------------------------------------------------------------
+  // RESPONSE TO SPEECH BUBBLE CHANGE
+  // ------------------------------------------------------------
+  void _onMessageChanged(String message) {
+    if (!mounted || _currentState == RobotState.actionTransition || widget.triggerNotifier.value != null) return;
+
+    // Cancel current idle timer and set busy state
+    _loopTimer?.cancel();
+    setState(() {
+      _isBusy = true;
+    });
+
+    // Check if message is health query related to trigger Thinking
+    if (message.contains("medicines") || message.contains("health") || message.contains("review")) {
+      _executeThinkingSequence();
+    } else {
+      _executeTalkingSequence();
     }
   }
 
+  Future<void> _executeThinkingSequence() async {
+    // 1. Chin touch, eyes look up, tilt head, pause
+    setState(() {
+      _currentState = RobotState.thinking;
+      _eyeExpression = EyeExpression.thinking;
+      _rightArmAngle = -0.85; // Chin touch
+      _leftArmAngle = -0.1;
+      _headTilt = 0.12;
+      _eyeOffsetX = 0.0;
+      _eyeOffsetY = -2.0; // Pupils up
+      _eyeScale = 0.95;
+    });
+
+    await Future.delayed(const Duration(milliseconds: 1800));
+    if (!mounted || _currentState == RobotState.actionTransition) return;
+
+    // 2. Smile, resolve thinking pose
+    setState(() {
+      _eyeExpression = EyeExpression.smile;
+      _eyeOffsetY = 0.0;
+      _eyeScale = 1.1;
+    });
+
+    await Future.delayed(const Duration(milliseconds: 800));
+    _completeSpeechActivity();
+  }
+
+  Future<void> _executeTalkingSequence() async {
+    // Lean forward slightly, nod head, eyes brighten, move one hand naturally
+    setState(() {
+      _currentState = RobotState.talking;
+      _eyeExpression = EyeExpression.normal;
+      _headOffsetY = 2.0; // Lean forward
+      _eyeScale = 1.15; // Brighten eyes
+      _glowExtra = true;
+      _rightArmAngle = -0.35; // Move arm slightly up
+    });
+
+    // Quick nod oscillation
+    for (int i = 0; i < 3; i++) {
+      if (!mounted || _currentState == RobotState.actionTransition) return;
+      setState(() {
+        _headTilt = i % 2 == 0 ? 0.06 : -0.03;
+      });
+      await Future.delayed(const Duration(milliseconds: 350));
+    }
+
+    _completeSpeechActivity();
+  }
+
+  void _completeSpeechActivity() {
+    if (!mounted || _currentState == RobotState.actionTransition) return;
+
+    final random = math.Random();
+    
+    // 35% chance to perform a quick happy celebration after talking
+    if (random.nextDouble() < 0.35) {
+      _executeHappyCelebration();
+    } else {
+      setState(() {
+        _returnToIdlePose();
+        _isBusy = false;
+      });
+      _startNaturalLoop();
+    }
+  }
+
+  Future<void> _executeHappyCelebration() async {
+    final random = math.Random().nextInt(3);
+
+    if (random == 0) { // Wiggle
+      await _animateDance(steps: 4);
+    } else if (random == 1) { // Quick bounce jump
+      setState(() {
+        _eyeExpression = EyeExpression.excited;
+        _headOffsetY = -4.0;
+      });
+      await Future.delayed(const Duration(milliseconds: 200));
+      setState(() {
+        _headOffsetY = 1.5;
+      });
+      await Future.delayed(const Duration(milliseconds: 150));
+    } else { // Clap
+      await _animateClap(claps: 4);
+    }
+
+    if (!mounted || _currentState == RobotState.actionTransition) return;
+
+    setState(() {
+      _returnToIdlePose();
+      _isBusy = false;
+    });
+    _startNaturalLoop();
+  }
+
+  // ------------------------------------------------------------
+  // RENDER INTERACTION
+  // ------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: Listenable.merge([
-        _hoverController,
-        _waveController,
-        _danceController,
-        _pulseController,
-      ]),
-      builder: (context, child) {
-        final double hoverVal = _hoverAnimation.value;
-        double bodyTiltVal = 0.0;
-        double headTiltVal = 0.0;
-        double rightArmVal = 0.2;
-        double leftArmVal = -0.2;
-
-        // Map robot state animations to painter rotation parameters
-        if (_currentState == RobotState.dancing) {
-          bodyTiltVal = _danceAnimation.value;
-          rightArmVal = 0.4 - (_danceAnimation.value * 2.0);
-          leftArmVal = -0.4 + (_danceAnimation.value * 2.0);
-        } 
-        else if (_currentState == RobotState.greeting) {
-          rightArmVal = _waveAnimation.value; // Waving hand
-          leftArmVal = -0.25;
-        } 
-        else if (_currentState == RobotState.talking || _currentState == RobotState.actionTransition) {
-          rightArmVal = _waveAnimation.value; // Talk hand movement
-          headTiltVal = 0.05 * math.sin(_hoverController.value * math.pi * 2);
-        } 
-        else if (_currentState == RobotState.pointing) {
-          rightArmVal = -1.25; // Pointing left towards suggestions
-        } 
-        else if (_currentState == RobotState.thinking) {
-          rightArmVal = -0.85; // Touching chin
-          headTiltVal = 0.12; // Tilt head
-        } 
-        else if (_currentState == RobotState.heart) {
-          rightArmVal = -0.95; // Folds hands in Namaste
-          leftArmVal = 0.95;
-        }
-
-        return Column(
-          children: [
-            // Premium Speech Bubble
-            SizedBox(
-              height: 58,
-              width: 135,
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                transitionBuilder: (child, animation) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: ScaleTransition(
-                      scale: Tween<double>(begin: 0.88, end: 1.0).animate(
-                        CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
-                      ),
-                      child: child,
+    // Intercept when parent passes a new message during build
+    return Column(
+      children: [
+        // Premium Speech Bubble
+        SizedBox(
+          height: 58,
+          width: 135,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
+              return Stack(
+                alignment: Alignment.center,
+                children: <Widget>[
+                  ...previousChildren,
+                  if (currentChild != null) currentChild,
+                ],
+              );
+            },
+            transitionBuilder: (child, animation) {
+              return FadeTransition(
+                opacity: animation,
+                child: ScaleTransition(
+                  scale: Tween<double>(begin: 0.88, end: 1.0).animate(
+                    CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+                  ),
+                  child: child,
+                ),
+              );
+            },
+            child: CustomPaint(
+              key: ValueKey<String>(_bubbleText),
+              painter: SpeechBubblePainter(),
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(10, 8, 10, 16),
+                alignment: Alignment.center,
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween<double>(begin: 0.0, end: 1.0),
+                  duration: const Duration(milliseconds: 200),
+                  builder: (context, val, child) {
+                    return Opacity(opacity: val, child: child);
+                  },
+                  child: Text(
+                    _bubbleText,
+                    style: const TextStyle(
+                      color: Color(0xFF1E244A),
+                      fontWeight: FontWeight.w800,
+                      fontSize: 10,
+                      height: 1.25,
                     ),
-                  );
-                },
-                child: CustomPaint(
-                  key: ValueKey<String>(_bubbleText),
-                  painter: SpeechBubblePainter(),
-                  child: Container(
-                    padding: const EdgeInsets.fromLTRB(10, 8, 10, 16),
-                    alignment: Alignment.center,
-                    child: Text(
-                      _bubbleText,
-                      style: const TextStyle(
-                        color: Color(0xFF1E244A),
-                        fontWeight: FontWeight.w800,
-                        fontSize: 10,
-                        height: 1.25,
-                      ),
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 4),
+          ),
+        ),
+        const SizedBox(height: 4),
 
-            // Premium Redesigned 3D-shaded Robot Canvas
-            SizedBox(
-              width: 140,
-              height: 118,
-              child: CustomPaint(
-                painter: PremiumRobotPainter(
-                  hoverOffset: hoverVal,
-                  bodyTilt: bodyTiltVal,
-                  headTilt: headTiltVal,
-                  rightArmAngle: rightArmVal,
-                  leftArmAngle: leftArmVal,
-                  pulseValue: _pulseAnimation.value,
-                  blinkValue: 1.0, // Blinks managed inside painter internally
-                  eyeExpression: _eyeExpression,
-                  glowExtra: _glowExtra,
-                  danceStep: _currentState == RobotState.dancing ? _danceAnimation.value : 0.0,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
+        // Premium Redesigned 3D-shaded Robot Canvas using TweenAnimationBuilders
+        SizedBox(
+          width: 140,
+          height: 118,
+          child: AnimatedBuilder(
+            animation: _hoverController,
+            builder: (context, child) {
+              final double hoverVal = _hoverAnimation.value;
+
+              // Animate physics values smoothly to avoid robotic jumps
+              return TweenAnimationBuilder<double>(
+                tween: Tween<double>(begin: 0.2, end: _rightArmAngle),
+                duration: const Duration(milliseconds: 320),
+                curve: Curves.easeOutBack,
+                builder: (context, rightArmVal, child) {
+                  return TweenAnimationBuilder<double>(
+                    tween: Tween<double>(begin: -0.2, end: _leftArmAngle),
+                    duration: const Duration(milliseconds: 320),
+                    curve: Curves.easeOutBack,
+                    builder: (context, leftArmVal, child) {
+                      return TweenAnimationBuilder<double>(
+                        tween: Tween<double>(begin: 0.0, end: _bodyTilt),
+                        duration: const Duration(milliseconds: 380),
+                        curve: Curves.easeInOut,
+                        builder: (context, bodyTiltVal, child) {
+                          return TweenAnimationBuilder<double>(
+                            tween: Tween<double>(begin: 0.0, end: _headTilt),
+                            duration: const Duration(milliseconds: 280),
+                            curve: Curves.easeOut,
+                            builder: (context, headTiltVal, child) {
+                              return TweenAnimationBuilder<double>(
+                                tween: Tween<double>(begin: 0.0, end: _eyeOffsetX),
+                                duration: const Duration(milliseconds: 200),
+                                curve: Curves.easeOut,
+                                builder: (context, eyeOffsetXVal, child) {
+                                  return TweenAnimationBuilder<double>(
+                                    tween: Tween<double>(begin: 0.0, end: _eyeOffsetY),
+                                    duration: const Duration(milliseconds: 200),
+                                    curve: Curves.easeOut,
+                                    builder: (context, eyeOffsetYVal, child) {
+                                      return TweenAnimationBuilder<double>(
+                                        tween: Tween<double>(begin: 0.0, end: _headOffsetY),
+                                        duration: const Duration(milliseconds: 280),
+                                        curve: Curves.easeInOut,
+                                        builder: (context, headOffsetYVal, child) {
+                                          return TweenAnimationBuilder<double>(
+                                            tween: Tween<double>(begin: 1.0, end: _eyeScale),
+                                            duration: const Duration(milliseconds: 250),
+                                            curve: Curves.easeOut,
+                                            builder: (context, eyeScaleVal, child) {
+                                              return CustomPaint(
+                                                painter: PremiumRobotPainter(
+                                                  hoverOffset: hoverVal,
+                                                  bodyTilt: bodyTiltVal,
+                                                  headTilt: headTiltVal,
+                                                  rightArmAngle: rightArmVal,
+                                                  leftArmAngle: leftArmVal,
+                                                  pulseValue: _pulseAnimation.value,
+                                                  blinkValue: _isBlinking ? 0.0 : 1.0,
+                                                  eyeExpression: _eyeExpression,
+                                                  glowExtra: _glowExtra,
+                                                  danceStep: bodyTiltVal,
+                                                  eyeOffsetX: eyeOffsetXVal,
+                                                  eyeOffsetY: eyeOffsetYVal,
+                                                  headOffsetY: headOffsetYVal,
+                                                  eyeScale: eyeScaleVal,
+                                                ),
+                                              );
+                                            },
+                                          );
+                                        },
+                                      );
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                          );
+                        },
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ],
     );
+  }
+
+  // Intercepting parent list message change
+  @override
+  void didUpdateWidget(covariant AnimatedRobot oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Listen to parent text changes to synchronize mouth/gestures
+    // This is driven by rotating idleMessages in the welcome screen.
+    // To sync text changes from rotation timer to behavior:
+    _onMessageChanged(_bubbleText);
   }
 }
 
@@ -725,6 +1059,10 @@ class PremiumRobotPainter extends CustomPainter {
   final EyeExpression eyeExpression;
   final bool glowExtra;
   final double danceStep;
+  final double eyeOffsetX;
+  final double eyeOffsetY;
+  final double headOffsetY;
+  final double eyeScale;
 
   PremiumRobotPainter({
     required this.hoverOffset,
@@ -737,6 +1075,10 @@ class PremiumRobotPainter extends CustomPainter {
     required this.eyeExpression,
     required this.glowExtra,
     required this.danceStep,
+    required this.eyeOffsetX,
+    required this.eyeOffsetY,
+    required this.headOffsetY,
+    required this.eyeScale,
   });
 
   @override
@@ -772,7 +1114,7 @@ class PremiumRobotPainter extends CustomPainter {
 
     // Coordinate points setup
     final bodyCenter = Offset(cx, size.height - 48);
-    final headCenter = Offset(cx, size.height - 84);
+    final headCenter = Offset(cx, size.height - 84 + headOffsetY);
 
     // 2. Draw Legs & Feet (anchored to torso but organically shaded)
     final leftLegStart = Offset(cx - 10, bodyCenter.dy + 12);
@@ -1081,8 +1423,15 @@ class PremiumRobotPainter extends CustomPainter {
       ..style = PaintingStyle.fill
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.0);
 
-    final leftEyeCenter = headCenter - const Offset(8, 0);
-    final rightEyeCenter = headCenter + const Offset(8, 0);
+    // Offset pupil center points
+    final leftEyeCenter = headCenter - const Offset(8, 0) + Offset(eyeOffsetX, eyeOffsetY);
+    final rightEyeCenter = headCenter + const Offset(8, 0) + Offset(eyeOffsetX, eyeOffsetY);
+
+    // Apply eye blinking scale
+    canvas.save();
+    canvas.translate(headCenter.dx, headCenter.dy);
+    canvas.scale(1.0, blinkValue);
+    canvas.translate(-headCenter.dx, -headCenter.dy);
 
     switch (eyeExpression) {
       case EyeExpression.smile:
@@ -1091,32 +1440,35 @@ class PremiumRobotPainter extends CustomPainter {
         break;
 
       case EyeExpression.excited:
-        // Large round glowing circles
-        canvas.drawCircle(leftEyeCenter, 3.8, glowPaint);
-        canvas.drawCircle(leftEyeCenter, 3.8, eyePaint);
-        canvas.drawCircle(rightEyeCenter, 3.8, glowPaint);
-        canvas.drawCircle(rightEyeCenter, 3.8, eyePaint);
+        final rSize = 3.8 * eyeScale;
+        canvas.drawCircle(leftEyeCenter, rSize, glowPaint);
+        canvas.drawCircle(leftEyeCenter, rSize, eyePaint);
+        canvas.drawCircle(rightEyeCenter, rSize, glowPaint);
+        canvas.drawCircle(rightEyeCenter, rSize, eyePaint);
         // Reflection highlights
         final refPaint = Paint()..color = Colors.white.withValues(alpha: 0.85);
-        canvas.drawCircle(leftEyeCenter - const Offset(1.0, 1.0), 0.9, refPaint);
-        canvas.drawCircle(rightEyeCenter - const Offset(1.0, 1.0), 0.9, refPaint);
+        canvas.drawCircle(leftEyeCenter - const Offset(1.0, 1.0), 0.9 * eyeScale, refPaint);
+        canvas.drawCircle(rightEyeCenter - const Offset(1.0, 1.0), 0.9 * eyeScale, refPaint);
         break;
 
       case EyeExpression.thinking:
         // Left eye normal, right eye offset/larger
-        canvas.drawCircle(leftEyeCenter, 2.8, glowPaint);
-        canvas.drawCircle(leftEyeCenter, 2.8, eyePaint);
+        final lSize = 2.8 * eyeScale;
+        final rSize = 3.4 * eyeScale;
+        canvas.drawCircle(leftEyeCenter, lSize, glowPaint);
+        canvas.drawCircle(leftEyeCenter, lSize, eyePaint);
         
-        canvas.drawCircle(rightEyeCenter, 3.4, glowPaint);
-        canvas.drawCircle(rightEyeCenter, 3.4, eyePaint);
+        canvas.drawCircle(rightEyeCenter, rSize, glowPaint);
+        canvas.drawCircle(rightEyeCenter, rSize, eyePaint);
         break;
 
       case EyeExpression.wink:
         // Left eye normal, right eye wink line
-        canvas.drawCircle(leftEyeCenter, 3.0, glowPaint);
-        canvas.drawCircle(leftEyeCenter, 3.0, eyePaint);
+        final lSize = 3.0 * eyeScale;
+        canvas.drawCircle(leftEyeCenter, lSize, glowPaint);
+        canvas.drawCircle(leftEyeCenter, lSize, eyePaint);
 
-        final winkRect = Rect.fromCenter(center: rightEyeCenter, width: 6.5, height: 1.5);
+        final winkRect = Rect.fromCenter(center: rightEyeCenter, width: 6.5 * eyeScale, height: 1.5 * eyeScale);
         final winkRRect = RRect.fromRectAndRadius(winkRect, const Radius.circular(0.8));
         canvas.drawRRect(winkRRect, glowPaint);
         canvas.drawRRect(winkRRect, eyePaint);
@@ -1124,37 +1476,39 @@ class PremiumRobotPainter extends CustomPainter {
 
       case EyeExpression.normal:
         // Friendly ovals
-        final leftRect = Rect.fromCenter(center: leftEyeCenter, width: 5.5, height: 6.5);
-        final rightRect = Rect.fromCenter(center: rightEyeCenter, width: 5.5, height: 6.5);
+        final leftRect = Rect.fromCenter(center: leftEyeCenter, width: 5.5 * eyeScale, height: 6.5 * eyeScale);
+        final rightRect = Rect.fromCenter(center: rightEyeCenter, width: 5.5 * eyeScale, height: 6.5 * eyeScale);
         canvas.drawOval(leftRect, glowPaint);
         canvas.drawOval(leftRect, eyePaint);
         canvas.drawOval(rightRect, glowPaint);
         canvas.drawOval(rightRect, eyePaint);
         // Soft white reflect
         final refPaint = Paint()..color = Colors.white.withValues(alpha: 0.8);
-        canvas.drawCircle(leftEyeCenter - const Offset(1.0, 1.0), 0.8, refPaint);
-        canvas.drawCircle(rightEyeCenter - const Offset(1.0, 1.0), 0.8, refPaint);
+        canvas.drawCircle(leftEyeCenter - const Offset(1.0, 1.0), 0.8 * eyeScale, refPaint);
+        canvas.drawCircle(rightEyeCenter - const Offset(1.0, 1.0), 0.8 * eyeScale, refPaint);
         break;
     }
+
+    canvas.restore();
   }
 
   void _drawSmilePath(Canvas canvas, Offset center, Paint glow, Paint solid) {
     final path = Path();
-    final double w = 6.0;
-    final double h = 5.0;
+    final double w = 6.0 * eyeScale;
+    final double h = 5.0 * eyeScale;
     path.moveTo(center.dx - w/2, center.dy + h/3);
     path.quadraticBezierTo(center.dx, center.dy - h*2/3, center.dx + w/2, center.dy + h/3);
 
     final strokePaint = Paint()
       ..color = solid.color
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.8
+      ..strokeWidth = 1.8 * eyeScale
       ..strokeCap = StrokeCap.round;
 
     final glowStrokePaint = Paint()
       ..color = glow.color
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.4
+      ..strokeWidth = 2.4 * eyeScale
       ..strokeCap = StrokeCap.round
       ..maskFilter = glow.maskFilter;
 
@@ -1165,3 +1519,4 @@ class PremiumRobotPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
+
