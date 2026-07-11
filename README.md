@@ -1,91 +1,133 @@
-# NURA - AI-Powered Care Copilot
+# 🌟 NURA — AI Health Copilot & Care Companion
 
-## Project Overview
-NURA is an AI-powered Care Copilot designed to help elderly users manage their daily healthcare through AI-assisted health monitoring, medication reminders, voice interaction, emergency support, and personalized health insights.
+NURA is a state-of-the-art, AI-powered health assistant designed specifically to empower seniors to manage their daily healthcare independently, while providing absolute peace of mind to their families and caregivers.
 
-## Problem Statement
-Elderly individuals often struggle with managing complex medication schedules, tracking daily wellness, and accessing immediate help during emergencies. Existing solutions are often fragmented, difficult to navigate, and lack empathetic, intelligent assistance tailored to seniors.
+---
 
-## Solution
-NURA bridges this gap by providing an intuitive, voice-enabled Flutter mobile application powered by an intelligent FastAPI backend and an advanced AI Engine. It acts as a 24/7 personalized care companion, simplifying healthcare management and providing peace of mind to both users and their families.
+## 📖 Project Vision
 
-## Core Features
-1. **AI Health Assistant**: Conversational AI for health queries and guidance.
-2. **Medication Reminder**: Smart scheduling, notifications, and adherence tracking.
-3. **Voice Assistant**: Hands-free navigation and interaction tailored for accessibility.
-4. **Emergency SOS**: One-tap emergency alerts to caregivers and services.
-5. **AI Doctor Report**: Automated summarization of daily wellness and health metrics for doctors.
-6. **Daily Wellness Check-in**: Routine logging of mood, vitals, and symptoms.
+NURA translates complex, fragmented health data into one chronological, easy-to-read **AI Health Timeline**. 
+It stands out as a voice-enabled care companion, listening to patient symptoms, organizing medication routines, scanning prescriptions via OCR, and triggering immediate Emergency SOS responses when needed.
 
-## System Architecture
-NURA follows a strict microservices-inspired architecture ensuring separation of concerns:
-- **Frontend (Flutter)**: Handles UI/UX and user interaction. Never communicates with the database or AI directly.
-- **Backend (FastAPI)**: Acts as the central orchestrator and REST API gateway.
-- **Database (PostgreSQL)**: Manages structured relational data (users, logs, schedules).
-- **AI Engine**: A dedicated service for natural language processing, insights, and report generation.
+---
 
-[Read detailed Architecture Documentation](docs/architecture.md)
+## 🛠️ Technology Stack
 
-## Repository Structure
-```
+NURA utilizes a secure, modern, and highly scalable decoupled stack:
+*   **Mobile App (Frontend):** Flutter (Dart) — Multiplatform, high-contrast neobrutalist elder-friendly UI.
+*   **Gateway Orchestrator (Backend):** FastAPI (Python) — Fast, structured REST endpoints.
+*   **Database:** PostgreSQL — Secure relational storage for vitals logs, user credentials, and medicine data.
+*   **Intelligence:** Dedicated AI Engine — Natural language queries, report formatting, and prescription parsing.
+
+---
+
+## 📦 Directory Structure
+
+```text
 nura/
-├── ai-engine/           # AI models, NLP processing, and prompt engineering
-├── assets/              # Shared assets (images, fonts, icons)
-├── backend/             # FastAPI application and routing logic
-├── database/            # PostgreSQL schemas, migrations, and seed data
-├── demo-video/          # Project demonstration recordings
-├── docs/                # Developer documentation, guidelines, and API specs
-├── frontend/            # Flutter mobile application
-│   └── lib/             # Frontend source code (core, screens, widgets, etc.)
-├── postman/             # API collections for testing
-├── presentation/        # Hackathon pitch deck and assets
-├── .gitignore           # Git ignore rules
-├── LICENSE              # Project license
-└── README.md            # Project overview and setup instructions
+├── ai-engine/                # LLM prompts, clinical summaries, and OCR parsing models
+├── backend/                  # FastAPI web server, routes, and DB models
+├── database/                 # PostgreSQL schemas, migrations, and seed scripts
+├── docs/                     # API specification, git workflows, and dev guidelines
+└── frontend/                 # Flutter mobile application
+    ├── assets/               # Image branding and high-fidelity sound effects
+    │   └── audio/            # Sound beeps, alerts, voice guide connectors, and connect clips
+    └── lib/
+        ├── core/             # Central route mapping, app themes, constants
+        ├── models/           # Strongly typed data models for JSON parsing
+        ├── screens/          # UI modules (Home, Wellness Timeline, Profile, SOS)
+        └── widgets/          # Animated voice waves, neobrutalist cards, customized buttons
 ```
 
-## Installation
-*(Detailed installation instructions will be added as modules are developed. General steps below.)*
+---
 
-1. **Clone the repository:**
-   ```bash
-   git clone <repository_url>
-   cd nura
-   ```
+## 🚀 Core Features & Experience
 
-2. **Frontend Setup:**
-   ```bash
-   cd frontend
-   flutter pub get
-   ```
+### 1. AI Health Timeline (Primary Interface)
+A chronological timeline capturing the user’s healthcare updates, designed with neobrutalist cards:
+*   **Report Uploaded & OCR Scans:** Displays analyzed details from prescription uploads.
+*   **Medicine Started & Taken:** Interactive tracking of drug compliance.
+*   **Vitals Logs & Symptoms:** Chronological updates for Heart Rate, BP, Blood Sugar, Temperature, and Water.
+*   **AI Insight Card:** Auto-generated wellness guides.
+*   **Doctor Summary:** Exportable clinical summaries for physician consults.
 
-3. **Backend Setup:**
-   ```bash
-   cd backend
-   python -m venv venv
-   source venv/bin/activate
-   pip install -r requirements.txt
-   ```
+### 2. Medication Management & OCR Scan
+An elder-friendly medicine scheduler displaying daily adherence. Includes a custom **prescriptions camera/upload scanner** simulating optical character recognition (OCR) and verifying scanned names, patient details, and dosages with 98%+ confidence.
 
-4. **Database:**
-   Ensure PostgreSQL is running and apply necessary schema migrations found in `database/`.
+### 3. Voice AI & "Ask NURA" Companion
+Accessible from every primary page via a global, floating voice companion button (**"Ask NURA"**). It features a smooth breathing scale animation, glowing pulses, and tactile haptic-shrink scale transitions.
+*   **Voice Standby Screen:** Interactive orbital-mic UI with listening indicators.
+*   **Voice Suggestion Cards:** Quick queries such as *"Explain my medicines"* or *"Summarize my latest report"*.
 
-## Project Workflow & Development Guidelines
-This is a collaborative hackathon project. To ensure smooth integration:
-- **Git Strategy**: Follow the established [Git Branch Workflow](docs/git_workflow.md).
-- **Coding Standards**: Adhere to the [Flutter Coding Standards](docs/coding_standards.md).
-- **Module Integration**: Review the [Developer Guide](docs/developer_guide.md) before adding new modules.
+### 4. Interactive High-Fidelity Audio Experience
+Fully integrated audio indicators powered by `audioplayers` that respond dynamically to screens and actions:
+*   **Startup Sound:** Plays `startup.mp3` once during the Splash screen animation.
+*   **Button Taps:** Reusable click sound triggers BEFORE the onPressed callbacks in `PrimaryButton`, `SecondaryButton`, `OutlinedButtonWidget`, and `DangerButton`.
+*   **Reminders:** Automatic entry chime in the Medication Reminder Notification screen (`notification.mp3`).
+*   **SOS Activation:** Interactive countdown beep synchronization (`countdown_beep.mp3`) and success chiming (`success.mp3`).
+*   **Voice Assistant:** Sound indicators mapping mic starts (`mic_start.mp3`), listening triggers (`listening.mp3`), voice guides (`voice_play.mp3`), call connections (`call_connect.mp3`), and disconnect cleanups (`call_end.mp3`).
 
-## Team Members
-1. **Salwa** - Frontend Developer (Flutter)
-2. **Tarun** - Backend Developer (FastAPI + PostgreSQL)
-3. **Deepti** - AI/ML Engineer
-4. **Arpit** - UI/UX Designer, Documentation & Deployment
+### 5. Emergency SOS
+One-tap activation screen initiating a 3-second warnings countdown. Shows real-time location transmitting grids and alerts emergency services and caregivers instantly.
 
-## Future Scope
-- Wearable integration (Smartwatches, IoT health devices)
-- Multilingual voice support for diverse elderly populations
-- Family portal for remote monitoring and caregiver alerts
+---
 
-## License
-MIT License
+## 🎨 Design System & Theming
+
+NURA is crafted with a high-contrast **Neobrutalist Design System** engineered for accessibility:
+*   **Elder-friendly typography:** Bold layout structures, large high-contrast fonts, and clear touch targets.
+*   **Color Theme:** Consistent light sky-blue background (`#E8F1F5`) combined with neobrutalist pastel accents (Lilac, Pink, Yellow, Cyan, Green) and solid black borders (`width: 1.8`, `offset: Offset(2, 4)` shadow depth).
+
+---
+
+## 🏗️ Architecture & State Management
+
+The frontend codebase is decoupled using **Clean Architecture** patterns:
+*   **Presentation Layer:** Standardized screen and widget segments completely isolated from backend endpoints.
+*   **State Management:** Powered by **Riverpod** for robust, compile-time safe, and context-independent data flow.
+*   **Routing:** Managed centrally using **GoRouter** to enable deep linking, tab branching, and nested view routing.
+
+---
+
+## ⚙️ Installation & Setup
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/Salwa-Tech16124/Nura.git
+cd nura
+```
+
+### 2. Setup the Flutter Frontend
+```bash
+cd frontend
+flutter pub get
+flutter run -d chrome  # or run on connected mobile emulator
+```
+*(Make sure sound files are present in `assets/audio/` to hear audio effects).*
+
+### 3. Setup the FastAPI Backend
+```bash
+cd backend
+python -m venv venv
+# Activate virtual environment (Windows: venv\Scripts\activate, Linux/macOS: source venv/bin/activate)
+pip install -r requirements.txt
+uvicorn main:app --reload
+```
+
+### 4. Database Setup
+Ensure PostgreSQL is active on your device. Configure the credentials inside your backend configuration environment and execute sql migration scripts found in `database/`.
+
+---
+
+## 👥 Team Members
+
+*   **Salwa:** Frontend Developer (Flutter)
+*   **Tarun:** Backend Developer (FastAPI + PostgreSQL)
+*   **Deepti:** AI/ML Engineer
+*   **Arpit:** UI/UX Designer, Documentation & Deployment
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
