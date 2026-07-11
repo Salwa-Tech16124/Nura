@@ -1,9 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants/app_spacing.dart';
+import '../../core/services/audio_service.dart';
 
-class VoiceStandbyScreen extends StatelessWidget {
+class VoiceStandbyScreen extends StatefulWidget {
   const VoiceStandbyScreen({super.key});
+
+  @override
+  State<VoiceStandbyScreen> createState() => _VoiceStandbyScreenState();
+}
+
+class _VoiceStandbyScreenState extends State<VoiceStandbyScreen> {
+  @override
+  void initState() {
+    super.initState();
+    AudioService().playVoiceMicStart();
+  }
+
+  @override
+  void dispose() {
+    AudioService().stopVoiceMicStart();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

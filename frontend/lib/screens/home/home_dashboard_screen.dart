@@ -234,13 +234,9 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                       ),
                     ),
                     const SizedBox(height: AppSpacing.sm),
-                    // Quick Action Tabs mock
                     Row(
                       children: [
                         _buildTabButton('Practices', true),
-                        _buildTabButton('Books', false),
-                        _buildTabButton('Movies', false),
-                        _buildTabButton('Tests', false),
                       ],
                     ),
                     const SizedBox(height: AppSpacing.md),
@@ -255,7 +251,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                       childAspectRatio: 0.95,
                       children: [
                         _buildActionCard(
-                          title: 'Health & Wellness',
+                          title: 'AI Health Timeline',
                           subtitle: 'Daily tracker',
                           bgColor: const Color(0xFFFBB584), // Orange/Peach
                           iconWidget: const Icon(Icons.coffee_outlined, size: 40, color: Color(0xFFE65100)),
@@ -269,11 +265,11 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                           onTap: () => context.go('/meds'),
                         ),
                         _buildActionCard(
-                          title: 'Voice AI',
-                          subtitle: 'Voice companion',
+                          title: 'Scan Prescription',
+                          subtitle: 'Extract Rx details',
                           bgColor: const Color(0xFFD3B6FC), // Soft Purple
-                          iconWidget: const Icon(Icons.mic_none_outlined, size: 40, color: Color(0xFF6A1B9A)),
-                          onTap: () => context.push('/voice'),
+                          iconWidget: const Icon(Icons.qr_code_scanner_outlined, size: 40, color: Color(0xFF6A1B9A)),
+                          onTap: () => context.go('/wellness'),
                         ),
                         _buildActionCard(
                           title: 'Wellness Logs',
@@ -312,12 +308,12 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     ),
                     const SizedBox(height: AppSpacing.md),
                     _buildScheduleCard(
-                      title: 'Doctor Appointment',
-                      subtitle: 'Dr. Smith - 2:30 PM',
-                      time: 'Confirmed',
-                      bgColor: const Color(0xFFE6F4EA), // Soft Green
-                      icon: Icons.calendar_today_rounded,
-                      iconColor: const Color(0xFF137333),
+                      title: 'Symptom Check-in',
+                      subtitle: 'Log current symptoms',
+                      time: 'Pending',
+                      bgColor: const Color(0xFFFFF9C4), // Soft Yellow
+                      icon: Icons.edit_note_rounded,
+                      iconColor: const Color(0xFFF57F17),
                     ),
                     const SizedBox(height: AppSpacing.md),
                     _buildScheduleCard(

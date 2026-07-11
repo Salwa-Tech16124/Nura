@@ -122,21 +122,23 @@ class AboutNuraScreen extends StatelessWidget {
 
             // Section 6: Future Roadmap
             const SectionHeader(title: 'Future Roadmap'),
-            const RoadmapCard(featureName: 'OCR Prescription Scanner', icon: Icons.document_scanner),
+            const RoadmapCard(featureName: 'Diet Planner & Calorie Counter', icon: Icons.restaurant),
             const SizedBox(height: AppSpacing.sm),
             const RoadmapCard(featureName: 'Hospital Integration', icon: Icons.local_hospital),
             const SizedBox(height: AppSpacing.sm),
             const RoadmapCard(featureName: 'Smart Watch Integration', icon: Icons.watch),
             const SizedBox(height: AppSpacing.sm),
-            const RoadmapCard(featureName: 'Doctor Portal', icon: Icons.medical_services),
+            const RoadmapCard(featureName: 'Doctor Portal & Telemedicine', icon: Icons.medical_services),
             const SizedBox(height: AppSpacing.sm),
-            const RoadmapCard(featureName: 'Family Dashboard', icon: Icons.family_restroom),
+            const RoadmapCard(featureName: 'Family Dashboard & Caregivers', icon: Icons.family_restroom),
             const SizedBox(height: AppSpacing.sm),
             const RoadmapCard(featureName: 'Wearable Device Support', icon: Icons.devices_other),
             const SizedBox(height: AppSpacing.sm),
             const RoadmapCard(featureName: 'Offline Wellness Guide', icon: Icons.wifi_off),
             const SizedBox(height: AppSpacing.sm),
-            const RoadmapCard(featureName: 'Medicine Delivery Integration', icon: Icons.local_pharmacy),
+            const RoadmapCard(featureName: 'Medicine Delivery Integration & Pharmacy', icon: Icons.local_pharmacy),
+            const SizedBox(height: AppSpacing.sm),
+            const RoadmapCard(featureName: 'Insurance Portal & Claims', icon: Icons.health_and_safety),
             const SizedBox(height: AppSpacing.xl),
 
             // Section 7: Team

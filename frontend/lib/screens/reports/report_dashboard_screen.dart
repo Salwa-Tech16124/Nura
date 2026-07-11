@@ -319,26 +319,20 @@ class ReportDashboardScreen extends StatelessWidget {
               iconBgColor: const Color(0xFFFED782), // Yellow
               onTap: () => context.push('/doctor-summary'),
             ),
+
             _buildNeobrutalistReportCategoryCard(
-              title: 'Health Trends',
-              description: 'Long-term trends of your vitals and activity.',
-              icon: Icons.trending_up,
-              iconBgColor: const Color(0xFFE5D5FF), // Lilac
-              onTap: () {},
-            ),
-            _buildNeobrutalistReportCategoryCard(
-              title: 'Diet Report',
-              description: 'Nutrition and hydration insights.',
-              icon: Icons.restaurant,
+              title: 'AI Health Summary',
+              description: 'AI-generated personalized health insights.',
+              icon: Icons.auto_awesome,
               iconBgColor: const Color(0xFFC2F3F8), // Cyan
-              onTap: () {},
+              onTap: () => context.push('/ai-summary'),
             ),
             _buildNeobrutalistReportCategoryCard(
               title: 'Medication Report',
               description: 'Adherence history and missed doses.',
               icon: Icons.medication_liquid,
               iconBgColor: const Color(0xFFC3F3C0), // Green
-              onTap: () {},
+              onTap: () => context.push('/meds-history'),
             ),
             const SizedBox(height: AppSpacing.xl),
 

@@ -5,6 +5,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../widgets/map_placeholder.dart';
 import '../../widgets/location_ripple.dart';
+import '../../core/services/audio_service.dart';
 
 class SosActiveTrackingScreen extends StatelessWidget {
   const SosActiveTrackingScreen({super.key});
@@ -70,7 +71,10 @@ class SosActiveTrackingScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                       ),
                     ),
-                    onPressed: () => context.go('/home'),
+                    onPressed: () {
+                      AudioService().playSosCancelSound();
+                      context.go('/home');
+                    },
                     child: Text('Cancel Emergency', style: AppTypography.button.copyWith(color: AppColors.textInverse)),
                   ),
                   const SizedBox(height: AppSpacing.lg),

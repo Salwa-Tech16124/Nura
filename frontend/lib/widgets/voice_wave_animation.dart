@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../core/theme/app_colors.dart';
 import 'dart:math' as math;
+import '../core/services/audio_service.dart';
 
 class VoiceWaveAnimation extends StatefulWidget {
   final Color color;
@@ -26,11 +27,16 @@ class _VoiceWaveAnimationState extends State<VoiceWaveAnimation> with SingleTick
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     )..repeat();
+    
+    // Play listening sound once when the wave animation mounts
+    AudioService().playVoiceListeningSound();
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    // Stop the listening sound
+    AudioService().stopVoiceListeningSound();
     super.dispose();
   }
 

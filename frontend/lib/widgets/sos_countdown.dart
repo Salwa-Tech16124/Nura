@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import '../core/theme/app_colors.dart';
 import '../core/theme/app_typography.dart';
+import '../core/services/audio_service.dart';
 
 class SosCountdown extends StatefulWidget {
   final VoidCallback? onComplete;
@@ -25,11 +26,16 @@ class _SosCountdownState extends State<SosCountdown> with SingleTickerProviderSt
       duration: const Duration(milliseconds: 1000),
     )..repeat(reverse: true);
     
+    // Play initial warning beep for 3
+    AudioService().playSosBeepSound();
+
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_count > 1) {
         setState(() {
           _count--;
         });
+        // Play warning beep for 2 and 1
+        AudioService().playSosBeepSound();
       } else {
         timer.cancel();
         widget.onComplete?.call();
@@ -41,6 +47,7 @@ class _SosCountdownState extends State<SosCountdown> with SingleTickerProviderSt
   void dispose() {
     _timer?.cancel();
     _pulseController.dispose();
+    AudioService().stopSosBeepSound();
     super.dispose();
   }
 

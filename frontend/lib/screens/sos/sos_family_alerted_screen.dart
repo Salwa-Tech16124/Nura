@@ -4,6 +4,7 @@ import 'dart:async';
 import '../../core/constants/app_spacing.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
+import '../../core/services/audio_service.dart';
 
 class SosFamilyAlertedScreen extends StatefulWidget {
   const SosFamilyAlertedScreen({super.key});
@@ -18,6 +19,9 @@ class _SosFamilyAlertedScreenState extends State<SosFamilyAlertedScreen> {
   @override
   void initState() {
     super.initState();
+    // Play success chime sound once
+    AudioService().playSosSuccessSound();
+    
     _timer = Timer(const Duration(seconds: 3), () {
       if (mounted) {
         context.pushReplacement('/sos-active-tracking');
@@ -28,6 +32,8 @@ class _SosFamilyAlertedScreenState extends State<SosFamilyAlertedScreen> {
   @override
   void dispose() {
     _timer?.cancel();
+    // Stop the success sound if navigated away
+    AudioService().stopSosSuccessSound();
     super.dispose();
   }
 

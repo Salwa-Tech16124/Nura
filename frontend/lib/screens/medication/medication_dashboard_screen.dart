@@ -11,6 +11,7 @@ class MedicationDashboardScreen extends StatefulWidget {
 }
 
 class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
+
   final bool _hasMedicines = true; // Toggle for empty state testing
   
   final List<Map<String, dynamic>> _upcomingMedicines = [

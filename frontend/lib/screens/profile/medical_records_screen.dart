@@ -58,7 +58,7 @@ class MedicalRecordsScreen extends StatelessWidget {
             const SizedBox(height: AppSpacing.sm),
             const CategoryCard(title: 'Medical Certificates', fileCount: '2', icon: Icons.verified),
             const SizedBox(height: AppSpacing.sm),
-            const CategoryCard(title: 'Insurance', fileCount: '1', icon: Icons.health_and_safety),
+            const CategoryCard(title: 'Vaccinations', fileCount: '1', icon: Icons.health_and_safety),
             const SizedBox(height: AppSpacing.sm),
             const CategoryCard(title: 'Hospital Records', fileCount: '12', icon: Icons.local_hospital),
             const SizedBox(height: AppSpacing.xl),

@@ -2,9 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants/app_spacing.dart';
 import '../../widgets/voice_wave_animation.dart';
+import '../../core/services/audio_service.dart';
 
-class CallInitiatedScreen extends StatelessWidget {
+class CallInitiatedScreen extends StatefulWidget {
   const CallInitiatedScreen({super.key});
+
+  @override
+  State<CallInitiatedScreen> createState() => _CallInitiatedScreenState();
+}
+
+class _CallInitiatedScreenState extends State<CallInitiatedScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Play call connect sound once
+    AudioService().playVoiceCallConnectSound();
+  }
+
+  @override
+  void dispose() {
+    // Stop the call connect sound
+    AudioService().stopVoiceCallConnectSound();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -111,6 +131,7 @@ class CallInitiatedScreen extends StatelessWidget {
                   shadowColor: const Color(0xFFD84315).withAlpha(100),
                 ),
                 onPressed: () {
+                  AudioService().playVoiceCallEndSound();
                   if (context.canPop()) {
                     context.pop();
                   } else {

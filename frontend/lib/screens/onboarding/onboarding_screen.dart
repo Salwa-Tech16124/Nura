@@ -268,7 +268,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   width: _currentPage == index ? 24 : 8,
                   height: 8,
                   decoration: BoxDecoration(
-                    color: _currentPage == index ? Colors.white : Colors.white.withAlpha(100),
+                    color: _currentPage == index ? Colors.black : Colors.black.withAlpha(80),
                     borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
                   ),
                 ),
@@ -284,7 +284,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   child: Text(
                     'Skip',
                     style: AppTypography.bodyLarge.copyWith(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -297,7 +297,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       Text(
                         _currentPage == _pages.length - 1 ? "Let's Start" : "Next",
                         style: AppTypography.bodyLarge.copyWith(
-                          color: Colors.white,
+                          color: Colors.black,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

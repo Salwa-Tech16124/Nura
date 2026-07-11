@@ -38,7 +38,6 @@ class SettingsPreferencesScreen extends StatelessWidget {
                 PreferenceTile(title: 'Medicine Reminders', isToggle: true, toggleValue: true),
                 PreferenceTile(title: 'Health Alerts', isToggle: true, toggleValue: true),
                 PreferenceTile(title: 'SOS Notifications', isToggle: true, toggleValue: true),
-                PreferenceTile(title: 'Appointment Reminders', isToggle: true, toggleValue: true),
               ],
             ),
             const SizedBox(height: AppSpacing.xl),
@@ -83,7 +82,6 @@ class SettingsPreferencesScreen extends StatelessWidget {
             const SettingsSectionCard(
               children: [
                 PreferenceTile(title: 'AI Health Suggestions', value: 'Enabled'),
-                PreferenceTile(title: 'Diet Recommendations', value: 'Enabled'),
                 PreferenceTile(title: 'Medication Suggestions', value: 'Enabled'),
                 PreferenceTile(title: 'Health Report Generation', value: 'Automatic'),
               ],

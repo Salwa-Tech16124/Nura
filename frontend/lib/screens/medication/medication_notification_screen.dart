@@ -8,9 +8,27 @@ import '../../widgets/badges.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/constants/app_spacing.dart';
+import '../../core/services/audio_service.dart';
 
-class MedicationNotificationScreen extends StatelessWidget {
+class MedicationNotificationScreen extends StatefulWidget {
   const MedicationNotificationScreen({super.key});
+
+  @override
+  State<MedicationNotificationScreen> createState() => _MedicationNotificationScreenState();
+}
+
+class _MedicationNotificationScreenState extends State<MedicationNotificationScreen> {
+  @override
+  void initState() {
+    super.initState();
+    AudioService().playNotificationSound();
+  }
+
+  @override
+  void dispose() {
+    AudioService().stopNotificationSound();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

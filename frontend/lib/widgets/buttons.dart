@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../core/constants/app_spacing.dart';
 import '../core/theme/app_colors.dart';
 import '../core/theme/app_typography.dart';
+import '../core/services/audio_service.dart';
 
 class PrimaryButton extends StatelessWidget {
   final String text;
@@ -21,7 +22,12 @@ class PrimaryButton extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusPill)),
         elevation: 2,
       ),
-      onPressed: isLoading ? null : onPressed,
+      onPressed: (isLoading || onPressed == null)
+          ? null
+          : () {
+              AudioService().playButtonClick();
+              onPressed!();
+            },
       child: isLoading 
           ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: AppColors.textInverse, strokeWidth: 2))
           : Text(text, style: AppTypography.button),
@@ -44,7 +50,12 @@ class SecondaryButton extends StatelessWidget {
         minimumSize: const Size.fromHeight(56),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusPill)),
       ),
-      onPressed: onPressed,
+      onPressed: onPressed == null
+          ? null
+          : () {
+              AudioService().playButtonClick();
+              onPressed!();
+            },
       child: Text(text, style: AppTypography.button),
     );
   }
@@ -66,7 +77,12 @@ class OutlinedButtonWidget extends StatelessWidget {
         minimumSize: const Size.fromHeight(56),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusPill)),
       ),
-      onPressed: onPressed,
+      onPressed: onPressed == null
+          ? null
+          : () {
+              AudioService().playButtonClick();
+              onPressed!();
+            },
       child: Text(text, style: AppTypography.button.copyWith(color: color)),
     );
   }
@@ -88,7 +104,12 @@ class DangerButton extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusPill)),
         elevation: 4,
       ),
-      onPressed: onPressed,
+      onPressed: onPressed == null
+          ? null
+          : () {
+              AudioService().playButtonClick();
+              onPressed!();
+            },
       child: Text(text, style: AppTypography.button),
     );
   }

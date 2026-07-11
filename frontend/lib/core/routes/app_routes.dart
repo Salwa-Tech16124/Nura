@@ -22,6 +22,7 @@ import '../../screens/medication/confirm_medication_screen.dart';
 import '../../screens/medication/medication_history_screen.dart';
 import '../../screens/medication/family_alert_screen.dart';
 import '../../screens/voice/voice_standby_screen.dart';
+import '../../screens/voice/voice_welcome_screen.dart';
 import '../../screens/voice/medicine_query_screen.dart';
 import '../../screens/voice/hydration_reminder_screen.dart';
 import '../../screens/voice/language_selection_screen.dart';
@@ -78,7 +79,8 @@ class AppRouter {
       GoRoute(path: '/meds-confirm', builder: (context, state) => const ConfirmMedicationScreen()),
       GoRoute(path: '/meds-history', builder: (context, state) => const MedicationHistoryScreen()),
       GoRoute(path: '/family-alert', builder: (context, state) => const FamilyAlertScreen()),
-      GoRoute(path: '/voice', builder: (context, state) => const VoiceStandbyScreen()),
+      GoRoute(path: '/voice', builder: (context, state) => const VoiceWelcomeScreen()),
+      GoRoute(path: '/voice-standby', builder: (context, state) => const VoiceStandbyScreen()),
       GoRoute(path: '/voice-medicine-query', builder: (context, state) => const MedicineQueryScreen()),
       GoRoute(path: '/voice-hydration', builder: (context, state) => const HydrationReminderScreen()),
       GoRoute(path: '/voice-language', builder: (context, state) => const LanguageSelectionScreen()),

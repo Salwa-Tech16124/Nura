@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/constants/app_spacing.dart';
+import '../../core/services/audio_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -23,14 +24,23 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     
     _controller.forward();
 
+    // Play the startup sound once
+    AudioService().playStartupSound();
+
     Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) context.go('/onboarding');
+      if (mounted) {
+        // Stop sound when navigating away
+        AudioService().stop();
+        context.go('/onboarding');
+      }
     });
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    // Stop sound if the screen is disposed/closed
+    AudioService().stop();
     super.dispose();
   }
 

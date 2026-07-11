@@ -106,7 +106,7 @@ class HealthProfileScreen extends StatelessWidget {
             const SizedBox(height: AppSpacing.sm),
             const MedicalDocumentCard(title: 'Prescription', date: 'Aug 20, 2026'),
             const SizedBox(height: AppSpacing.sm),
-            const MedicalDocumentCard(title: 'Health Insurance', date: 'Jan 01, 2026'),
+            const MedicalDocumentCard(title: 'Vaccination Record', date: 'Jan 01, 2026'),
             const SizedBox(height: AppSpacing.xl),
 
             // Bottom Actions
