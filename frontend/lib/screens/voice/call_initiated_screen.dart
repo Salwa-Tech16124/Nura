@@ -28,8 +28,10 @@ class _CallInitiatedScreenState extends State<CallInitiatedScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFE8F1F5), // Light sky-blue background
+      backgroundColor: isDark ? const Color(0xFF0A0C16) : const Color(0xFFE8F1F5), // Dynamic neobrutalist background
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.xl),
@@ -37,10 +39,10 @@ class _CallInitiatedScreenState extends State<CallInitiatedScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: AppSpacing.xl),
-              const Text(
+              Text(
                 'Call\nInitiated',
                 style: TextStyle(
-                  color: Color(0xFF1E244A),
+                  color: isDark ? Colors.white : const Color(0xFF1E244A),
                   fontWeight: FontWeight.w900,
                   fontSize: 32,
                   height: 1.2,
@@ -55,13 +57,13 @@ class _CallInitiatedScreenState extends State<CallInitiatedScreen> {
                 height: 180,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white,
-                  border: Border.all(color: Colors.black, width: 2.0),
-                  boxShadow: const [
+                  color: isDark ? const Color(0xFF121625) : Colors.white,
+                  border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 2.0),
+                  boxShadow: [
                     BoxShadow(
-                      color: Colors.black26,
+                      color: isDark ? Colors.white10 : Colors.black26,
                       blurRadius: 10,
-                      offset: Offset(0, 4),
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
@@ -70,28 +72,28 @@ class _CallInitiatedScreenState extends State<CallInitiatedScreen> {
                   child: Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: const Color(0xFFEDE7F6), // Lilac glow base
+                      color: isDark ? const Color(0xFF2C1E3F) : const Color(0xFFEDE7F6), // Lilac glow base
                     ),
-                    child: const Icon(Icons.person, size: 100, color: Color(0xFF1E244A)), // Dummy photo
+                    child: Icon(Icons.person, size: 100, color: isDark ? Colors.white : const Color(0xFF1E244A)), // Dummy photo
                   ),
                 ),
               ),
               const Spacer(flex: 1),
               
-              const Text(
+              Text(
                 'CALLING:',
                 style: TextStyle(
-                  color: Color(0xFFD84315),
+                  color: isDark ? const Color(0xFFFF8A65) : const Color(0xFFD84315),
                   letterSpacing: 1.5,
                   fontWeight: FontWeight.bold,
                   fontSize: 13,
                 ),
               ),
               const SizedBox(height: AppSpacing.xs),
-              const Text(
+              Text(
                 'David (Son)',
                 style: TextStyle(
-                  color: Colors.black,
+                  color: isDark ? Colors.white : Colors.black,
                   fontWeight: FontWeight.w900,
                   fontSize: 24,
                 ),
@@ -100,19 +102,19 @@ class _CallInitiatedScreenState extends State<CallInitiatedScreen> {
               
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  VoiceWaveAnimation(color: Color(0xFF2E7D32), height: 24),
-                  SizedBox(width: AppSpacing.md),
+                children: [
+                  VoiceWaveAnimation(color: isDark ? const Color(0xFF81C784) : const Color(0xFF2E7D32), height: 24),
+                  const SizedBox(width: AppSpacing.md),
                   Text(
                     '00:03',
                     style: TextStyle(
-                      color: Color(0xFF2E7D32),
+                      color: isDark ? const Color(0xFF81C784) : const Color(0xFF2E7D32),
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                     ),
                   ),
-                  SizedBox(width: AppSpacing.md),
-                  VoiceWaveAnimation(color: Color(0xFF2E7D32), height: 24),
+                  const SizedBox(width: AppSpacing.md),
+                  VoiceWaveAnimation(color: isDark ? const Color(0xFF81C784) : const Color(0xFF2E7D32), height: 24),
                 ],
               ),
               
@@ -126,7 +128,7 @@ class _CallInitiatedScreenState extends State<CallInitiatedScreen> {
                   minimumSize: const Size(double.infinity, 56),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(28),
-                    side: const BorderSide(color: Colors.black, width: 1.8),
+                    side: BorderSide(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
                   ),
                   elevation: 0,
                   shadowColor: Colors.black,

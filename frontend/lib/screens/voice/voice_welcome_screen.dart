@@ -69,20 +69,33 @@ class _VoiceWelcomeScreenState extends State<VoiceWelcomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: isDark ? const Color(0xFF0A0C16) : null,
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFE8F1F5), // Light sky-blue
-              Color(0xFFE0F7FA), // Light cyan
-              Colors.white,
-            ],
-          ),
+        decoration: BoxDecoration(
+          gradient: isDark
+              ? const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFF0A0C16),
+                    Color(0xFF13172E),
+                    Color(0xFF0A0C16),
+                  ],
+                )
+              : const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFFE8F1F5), // Light sky-blue
+                    Color(0xFFE0F7FA), // Light cyan
+                    Colors.white,
+                  ],
+                ),
         ),
         child: SafeArea(
           child: Padding(
@@ -103,24 +116,24 @@ class _VoiceWelcomeScreenState extends State<VoiceWelcomeScreen> {
                           Text(
                             'Hello John 👋',
                             style: AppTypography.bodyLarge.copyWith(
-                              color: Colors.black54,
+                              color: isDark ? Colors.white70 : Colors.black54,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           const SizedBox(height: 4),
-                          const Text(
+                          Text(
                             "I'm NURA",
                             style: TextStyle(
-                              color: Color(0xFF1E244A),
+                              color: isDark ? Colors.white : const Color(0xFF1E244A),
                               fontWeight: FontWeight.w900,
                               fontSize: 32,
                               letterSpacing: 0.5,
                             ),
                           ),
-                          const Text(
+                          Text(
                             "Your AI Health Copilot",
                             style: TextStyle(
-                              color: Color(0xFF2E7D32),
+                              color: isDark ? const Color(0xFF81C784) : const Color(0xFF2E7D32),
                               fontWeight: FontWeight.bold,
                               fontSize: 18,
                             ),
@@ -138,10 +151,10 @@ class _VoiceWelcomeScreenState extends State<VoiceWelcomeScreen> {
                   ],
                 ),
                 const SizedBox(height: AppSpacing.sm),
-                const Text(
+                Text(
                   "I understand your medicines, reports, symptoms and health history. How can I help you today?",
                   style: TextStyle(
-                    color: Colors.black87,
+                    color: isDark ? Colors.white70 : Colors.black87,
                     fontSize: 14,
                     height: 1.4,
                     fontWeight: FontWeight.w500,
@@ -151,10 +164,10 @@ class _VoiceWelcomeScreenState extends State<VoiceWelcomeScreen> {
                 const SizedBox(height: AppSpacing.md),
                 
                 // Suggestions Section
-                const Text(
+                Text(
                   'Quick Suggestions',
                   style: TextStyle(
-                    color: Colors.black87,
+                    color: isDark ? Colors.white : Colors.black87,
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                   ),
@@ -165,6 +178,7 @@ class _VoiceWelcomeScreenState extends State<VoiceWelcomeScreen> {
                     physics: const BouncingScrollPhysics(),
                     children: [
                       _buildSuggestionCard(
+                        context,
                         icon: Icons.medication_outlined,
                         color: const Color(0xFFC2F3F8), // Cyan
                         title: 'Explain my medicines',
@@ -172,6 +186,7 @@ class _VoiceWelcomeScreenState extends State<VoiceWelcomeScreen> {
                       ),
                       const SizedBox(height: AppSpacing.md),
                       _buildSuggestionCard(
+                        context,
                         icon: Icons.description_outlined,
                         color: const Color(0xFFFED782), // Yellow
                         title: 'Summarize my latest report',
@@ -179,6 +194,7 @@ class _VoiceWelcomeScreenState extends State<VoiceWelcomeScreen> {
                       ),
                       const SizedBox(height: AppSpacing.md),
                       _buildSuggestionCard(
+                        context,
                         icon: Icons.trending_up_outlined,
                         color: const Color(0xFFC3F3C0), // Green
                         title: 'Show my health timeline',
@@ -186,6 +202,7 @@ class _VoiceWelcomeScreenState extends State<VoiceWelcomeScreen> {
                       ),
                       const SizedBox(height: AppSpacing.md),
                       _buildSuggestionCard(
+                        context,
                         icon: Icons.science_outlined,
                         color: const Color(0xFFE5D5FF), // Lilac
                         title: 'Explain my latest prescription',
@@ -206,7 +223,7 @@ class _VoiceWelcomeScreenState extends State<VoiceWelcomeScreen> {
                     const SizedBox(height: AppSpacing.sm),
                     OutlinedButtonWidget(
                       text: 'Skip',
-                      color: Colors.black,
+                      color: isDark ? Colors.white : Colors.black,
                       onPressed: () => context.pop(),
                     ),
                     const SizedBox(height: AppSpacing.md),
@@ -220,24 +237,26 @@ class _VoiceWelcomeScreenState extends State<VoiceWelcomeScreen> {
     );
   }
 
-  Widget _buildSuggestionCard({
+  Widget _buildSuggestionCard(
+    BuildContext context, {
     required IconData icon,
     required Color color,
     required String title,
     required VoidCallback onTap,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? const Color(0xFF121625) : Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.black, width: 1.8),
-          boxShadow: const [
+          border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
+          boxShadow: [
             BoxShadow(
-              color: Colors.black,
-              offset: Offset(2, 4),
+              color: isDark ? Colors.white10 : Colors.black,
+              offset: const Offset(2, 4),
             ),
           ],
         ),
@@ -256,14 +275,14 @@ class _VoiceWelcomeScreenState extends State<VoiceWelcomeScreen> {
             Expanded(
               child: Text(
                 title,
-                style: const TextStyle(
-                  color: Colors.black,
+                style: TextStyle(
+                  color: isDark ? Colors.white : Colors.black,
                   fontWeight: FontWeight.bold,
                   fontSize: 15,
                 ),
               ),
             ),
-            const Icon(Icons.arrow_forward_ios, color: Colors.black54, size: 16),
+            Icon(Icons.arrow_forward_ios, color: isDark ? Colors.white60 : Colors.black54, size: 16),
           ],
         ),
       ),

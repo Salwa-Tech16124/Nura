@@ -7,13 +7,14 @@ class ReportDashboardScreen extends StatelessWidget {
   const ReportDashboardScreen({super.key});
 
   // Local helper for section headers
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(BuildContext context, String title) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.only(top: AppSpacing.lg, bottom: AppSpacing.sm),
       child: Text(
         title,
-        style: const TextStyle(
-          color: Colors.black,
+        style: TextStyle(
+          color: isDark ? Colors.white : Colors.black,
           fontSize: 16,
           fontWeight: FontWeight.w900,
         ),
@@ -22,22 +23,24 @@ class ReportDashboardScreen extends StatelessWidget {
   }
 
   // Neobrutalist StatCard builder
-  Widget _buildNeobrutalistStatCard({
+  Widget _buildNeobrutalistStatCard(
+    BuildContext context, {
     required String title,
     required String value,
     required IconData icon,
     required Color iconBgColor,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF121625) : Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.black, width: 1.8),
-        boxShadow: const [
+        border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
+        boxShadow: [
           BoxShadow(
-            color: Colors.black,
-            offset: Offset(2, 4),
+            color: isDark ? Colors.white10 : Colors.black,
+            offset: const Offset(2, 4),
           ),
         ],
       ),
@@ -63,7 +66,7 @@ class ReportDashboardScreen extends StatelessWidget {
               Expanded(
                 child: Text(
                   title, 
-                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black54, fontSize: 12),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black54, fontSize: 12),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -73,7 +76,7 @@ class ReportDashboardScreen extends StatelessWidget {
           const Spacer(),
           Text(
             value, 
-            style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.black, fontSize: 18),
+            style: TextStyle(fontWeight: FontWeight.w900, color: isDark ? Colors.white : Colors.black, fontSize: 18),
           ),
         ],
       ),
@@ -81,24 +84,26 @@ class ReportDashboardScreen extends StatelessWidget {
   }
 
   // Neobrutalist ReportCategoryCard builder
-  Widget _buildNeobrutalistReportCategoryCard({
+  Widget _buildNeobrutalistReportCategoryCard(
+    BuildContext context, {
     required String title,
     required String description,
     required IconData icon,
     required Color iconBgColor,
     required VoidCallback onTap,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF121625) : Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.black, width: 1.8),
-        boxShadow: const [
+        border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
+        boxShadow: [
           BoxShadow(
-            color: Colors.black,
-            offset: Offset(2, 4),
+            color: isDark ? Colors.white10 : Colors.black,
+            offset: const Offset(2, 4),
           ),
         ],
       ),
@@ -123,12 +128,12 @@ class ReportDashboardScreen extends StatelessWidget {
               children: [
                 Text(
                   title, 
-                  style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.black, fontSize: 14),
+                  style: TextStyle(fontWeight: FontWeight.w900, color: isDark ? Colors.white : Colors.black, fontSize: 14),
                 ),
                 const SizedBox(height: AppSpacing.xs),
                 Text(
                   description, 
-                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black54, fontSize: 12),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black54, fontSize: 12),
                 ),
               ],
             ),
@@ -169,22 +174,24 @@ class ReportDashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFE8F1F5), // Light sky-blue neobrutalist background
+      backgroundColor: isDark ? const Color(0xFF0A0C16) : const Color(0xFFE8F1F5), // Dynamic neobrutalist background
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
+        title: Text(
           'Health Reports',
           style: TextStyle(
-            color: Colors.black,
+            color: isDark ? Colors.white : Colors.black,
             fontWeight: FontWeight.w900,
             fontSize: 20,
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, color: isDark ? Colors.white : Colors.black, size: 20),
           onPressed: () => context.go('/home'),
         ),
       ),
@@ -193,10 +200,10 @@ class ReportDashboardScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const SizedBox(height: AppSpacing.sm),
-            const Text(
+            Text(
               'Your personalized health insights and reports.', 
               style: TextStyle(
-                color: Colors.black87,
+                color: isDark ? Colors.white70 : Colors.black87,
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
               ),
@@ -204,7 +211,7 @@ class ReportDashboardScreen extends StatelessWidget {
             const SizedBox(height: AppSpacing.lg),
 
             // Quick Statistics
-            _buildSectionHeader('Quick Statistics'),
+            _buildSectionHeader(context, 'Quick Statistics'),
             GridView.count(
               crossAxisCount: 2,
               shrinkWrap: true,
@@ -214,24 +221,28 @@ class ReportDashboardScreen extends StatelessWidget {
               childAspectRatio: 1.45,
               children: [
                 _buildNeobrutalistStatCard(
+                  context,
                   title: 'Health Score', 
                   value: '86 / 100', 
                   icon: Icons.health_and_safety,
                   iconBgColor: const Color(0xFFFED782), // Yellow
                 ),
                 _buildNeobrutalistStatCard(
+                  context,
                   title: 'Medicine Adherence', 
                   value: '92%', 
                   icon: Icons.medication,
                   iconBgColor: const Color(0xFFFDCBE0), // Pink
                 ),
                 _buildNeobrutalistStatCard(
+                  context,
                   title: 'Average Steps', 
                   value: '7,450', 
                   icon: Icons.directions_walk,
                   iconBgColor: const Color(0xFFE5D5FF), // Lilac
                 ),
                 _buildNeobrutalistStatCard(
+                  context,
                   title: 'Heart Rate', 
                   value: '76 BPM', 
                   icon: Icons.favorite,
@@ -248,13 +259,13 @@ class ReportDashboardScreen extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFC2F3F8), // Cyan
+                  color: isDark ? const Color(0xFF1E2A3A) : const Color(0xFFC2F3F8), // Dynamic background
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.black, width: 1.8),
-                  boxShadow: const [
+                  border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
+                  boxShadow: [
                     BoxShadow(
-                      color: Colors.black,
-                      offset: Offset(2, 4),
+                      color: isDark ? Colors.white10 : Colors.black,
+                      offset: const Offset(2, 4),
                     ),
                   ],
                 ),
@@ -274,18 +285,18 @@ class ReportDashboardScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: AppSpacing.md),
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'AI Insight', 
-                            style: TextStyle(fontWeight: FontWeight.w900, color: Colors.black, fontSize: 15),
+                            style: TextStyle(fontWeight: FontWeight.w900, color: isDark ? Colors.white : Colors.black, fontSize: 15),
                           ),
-                          SizedBox(height: AppSpacing.xs),
+                          const SizedBox(height: AppSpacing.xs),
                           Text(
                             '"Your overall health has improved by 12% compared to last month."',
-                            style: TextStyle(fontStyle: FontStyle.italic, color: Colors.black87, fontSize: 13, fontWeight: FontWeight.bold),
+                            style: TextStyle(fontStyle: FontStyle.italic, color: isDark ? Colors.white70 : Colors.black87, fontSize: 13, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
@@ -297,8 +308,9 @@ class ReportDashboardScreen extends StatelessWidget {
             const SizedBox(height: AppSpacing.xl),
 
             // Report Categories
-            _buildSectionHeader('Report Categories'),
+            _buildSectionHeader(context, 'Report Categories'),
             _buildNeobrutalistReportCategoryCard(
+              context,
               title: 'Weekly Health Report',
               description: 'Summary of your health metrics for the week.',
               icon: Icons.calendar_view_week,
@@ -306,6 +318,7 @@ class ReportDashboardScreen extends StatelessWidget {
               onTap: () => context.push('/weekly-report'),
             ),
             _buildNeobrutalistReportCategoryCard(
+              context,
               title: 'Monthly Health Report',
               description: 'Detailed analysis of your monthly wellness.',
               icon: Icons.calendar_month,
@@ -313,6 +326,7 @@ class ReportDashboardScreen extends StatelessWidget {
               onTap: () => context.push('/monthly-report'),
             ),
             _buildNeobrutalistReportCategoryCard(
+              context,
               title: 'Doctor Summary',
               description: 'Formatted report ready for your physician.',
               icon: Icons.medical_services,
@@ -321,6 +335,7 @@ class ReportDashboardScreen extends StatelessWidget {
             ),
 
             _buildNeobrutalistReportCategoryCard(
+              context,
               title: 'AI Health Summary',
               description: 'AI-generated personalized health insights.',
               icon: Icons.auto_awesome,
@@ -328,6 +343,7 @@ class ReportDashboardScreen extends StatelessWidget {
               onTap: () => context.push('/ai-summary'),
             ),
             _buildNeobrutalistReportCategoryCard(
+              context,
               title: 'Medication Report',
               description: 'Adherence history and missed doses.',
               icon: Icons.medication_liquid,
@@ -344,11 +360,11 @@ class ReportDashboardScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(28),
                 color: const Color(0xFFC2F3F8), // Cyan
-                border: Border.all(color: Colors.black, width: 1.8),
-                boxShadow: const [
+                border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
+                boxShadow: [
                   BoxShadow(
-                    color: Colors.black,
-                    offset: Offset(2, 4),
+                    color: isDark ? Colors.white10 : Colors.black,
+                    offset: const Offset(2, 4),
                   ),
                 ],
               ),
@@ -380,11 +396,11 @@ class ReportDashboardScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(28),
                 color: const Color(0xFFFED782), // Yellow
-                border: Border.all(color: Colors.black, width: 1.8),
-                boxShadow: const [
+                border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
+                boxShadow: [
                   BoxShadow(
-                    color: Colors.black,
-                    offset: Offset(2, 4),
+                    color: isDark ? Colors.white10 : Colors.black,
+                    offset: const Offset(2, 4),
                   ),
                 ],
               ),

@@ -39,8 +39,9 @@ class _SosFamilyAlertedScreenState extends State<SosFamilyAlertedScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: AppColors.surface,
+      backgroundColor: isDark ? const Color(0xFF0A0C16) : AppColors.surface,
       body: SafeArea(
         child: Stack(
           children: [
@@ -52,15 +53,15 @@ class _SosFamilyAlertedScreenState extends State<SosFamilyAlertedScreen> {
                   const SizedBox(height: AppSpacing.xxl),
                   const Icon(Icons.security, color: AppColors.error, size: 80),
                   const SizedBox(height: AppSpacing.md),
-                  Text('Status:', style: AppTypography.bodyMedium.copyWith(color: AppColors.textPrimary)),
-                  Text('ALERT SENT', style: AppTypography.h1.copyWith(color: AppColors.textPrimary)),
+                  Text('Status:', style: AppTypography.bodyMedium.copyWith(color: isDark ? Colors.white70 : AppColors.textPrimary)),
+                  Text('ALERT SENT', style: AppTypography.h1.copyWith(color: isDark ? Colors.white : AppColors.textPrimary)),
                   const SizedBox(height: AppSpacing.xxl),
                   
-                  _buildContact('Mom', '10:32 AM'),
+                  _buildContact(context, 'Mom', '10:32 AM'),
                   const Divider(),
-                  _buildContact('Dad', '10:32 AM'),
+                  _buildContact(context, 'Dad', '10:32 AM'),
                   const Divider(),
-                  _buildContact('Sarah', '10:32 AM'),
+                  _buildContact(context, 'Sarah', '10:32 AM'),
                 ],
               ),
             ),
@@ -73,16 +74,17 @@ class _SosFamilyAlertedScreenState extends State<SosFamilyAlertedScreen> {
                 width: 200,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.background,
+                  color: isDark ? const Color(0xFF121625) : AppColors.background,
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(AppSpacing.radiusLg),
                     bottomLeft: Radius.circular(AppSpacing.radiusLg),
                     topRight: Radius.circular(AppSpacing.radiusLg),
                     bottomRight: Radius.zero,
                   ),
+                  border: Border.all(color: isDark ? Colors.white24 : Colors.transparent),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: isDark ? Colors.white10 : Colors.black.withOpacity(0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -92,8 +94,8 @@ class _SosFamilyAlertedScreenState extends State<SosFamilyAlertedScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('ALERT:', style: AppTypography.bodySmall.copyWith(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
-                    Text('[Sarah\'s needs help!]\n[Link to location]\n@ 10:32 AM', style: AppTypography.bodySmall),
+                    Text('ALERT:', style: AppTypography.bodySmall.copyWith(color: isDark ? Colors.white : AppColors.textPrimary, fontWeight: FontWeight.bold)),
+                    Text('[Sarah\'s needs help!]\n[Link to location]\n@ 10:32 AM', style: AppTypography.bodySmall.copyWith(color: isDark ? Colors.white70 : Colors.black)),
                   ],
                 ),
               ),
@@ -104,21 +106,22 @@ class _SosFamilyAlertedScreenState extends State<SosFamilyAlertedScreen> {
     );
   }
 
-  Widget _buildContact(String name, String time) {
+  Widget _buildContact(BuildContext context, String name, String time) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor: AppColors.border,
-            child: Text(name[0], style: AppTypography.bodyLarge.copyWith(color: AppColors.textPrimary)),
+            backgroundColor: isDark ? Colors.white12 : AppColors.border,
+            child: Text(name[0], style: AppTypography.bodyLarge.copyWith(color: isDark ? Colors.white : AppColors.textPrimary)),
           ),
           const SizedBox(width: AppSpacing.lg),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(name, style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold)),
-              Text(time, style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary)),
+              Text(name, style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black)),
+              Text(time, style: AppTypography.bodySmall.copyWith(color: isDark ? Colors.white60 : AppColors.textSecondary)),
             ],
           ),
           const Spacer(),

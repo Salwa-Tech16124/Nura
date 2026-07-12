@@ -48,14 +48,19 @@ class SosActiveTrackingScreen extends StatelessWidget {
             alignment: Alignment.bottomCenter,
             child: Container(
               width: double.infinity,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF121625) : Colors.white,
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(24),
                   topRight: Radius.circular(24),
                 ),
+                border: Border.all(color: isDark ? Colors.white24 : Colors.transparent),
                 boxShadow: [
-                  BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, -4)),
+                  BoxShadow(
+                    color: isDark ? Colors.white10 : Colors.black26, 
+                    blurRadius: 10, 
+                    offset: const Offset(0, -4),
+                  ),
                 ],
               ),
               padding: const EdgeInsets.all(AppSpacing.xl),
@@ -81,17 +86,20 @@ class SosActiveTrackingScreen extends StatelessWidget {
                   
                   Align(
                     alignment: Alignment.centerLeft,
-                    child: Text('Family Members Notified', style: AppTypography.h3),
+                    child: Text(
+                      'Family Members Notified', 
+                      style: AppTypography.h3.copyWith(color: isDark ? Colors.white : Colors.black),
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   
-                  _buildTrackingContact('Mom'),
-                  _buildTrackingContact('Sarah'),
+                  _buildTrackingContact(context, 'Mom'),
+                  _buildTrackingContact(context, 'Sarah'),
                   
                   const SizedBox(height: AppSpacing.md),
                   Text(
                     'Emergency Services (911) may be dispatched\nbased on settings.',
-                    style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+                    style: AppTypography.bodySmall.copyWith(color: isDark ? Colors.white70 : AppColors.textSecondary),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -103,18 +111,19 @@ class SosActiveTrackingScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTrackingContact(String name) {
+  Widget _buildTrackingContact(BuildContext context, String name) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         children: [
           CircleAvatar(
             radius: 16,
-            backgroundColor: AppColors.border,
-            child: const Icon(Icons.person, size: 20, color: AppColors.textInverse),
+            backgroundColor: isDark ? Colors.white12 : AppColors.border,
+            child: Icon(Icons.person, size: 20, color: isDark ? Colors.white : AppColors.textInverse),
           ),
           const SizedBox(width: AppSpacing.md),
-          Text(name, style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold)),
+          Text(name, style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black)),
           const Spacer(),
           const Icon(Icons.wifi_tethering, color: AppColors.success, size: 20),
         ],

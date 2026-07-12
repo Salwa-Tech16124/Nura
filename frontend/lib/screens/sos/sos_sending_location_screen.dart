@@ -35,6 +35,7 @@ class _SosSendingLocationScreenState extends State<SosSendingLocationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       body: Stack(
         children: [
@@ -54,11 +55,12 @@ class _SosSendingLocationScreenState extends State<SosSendingLocationScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 decoration: BoxDecoration(
-                  color: AppColors.surface,
+                  color: isDark ? const Color(0xFF121625) : AppColors.surface,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                  border: Border.all(color: isDark ? Colors.white24 : Colors.transparent),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: isDark ? Colors.white10 : Colors.black.withOpacity(0.1),
                       blurRadius: 20,
                     ),
                   ],
@@ -68,13 +70,13 @@ class _SosSendingLocationScreenState extends State<SosSendingLocationScreen> {
                   children: [
                     Text(
                       'Alert Activated!\nLocating...',
-                      style: AppTypography.h3.copyWith(color: AppColors.textPrimary),
+                      style: AppTypography.h3.copyWith(color: isDark ? Colors.white : AppColors.textPrimary),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: AppSpacing.md),
                     LinearProgressIndicator(
                       value: null,
-                      backgroundColor: AppColors.border,
+                      backgroundColor: isDark ? Colors.white12 : AppColors.border,
                       color: AppColors.error,
                       minHeight: 6,
                       borderRadius: BorderRadius.circular(3),
@@ -82,7 +84,7 @@ class _SosSendingLocationScreenState extends State<SosSendingLocationScreen> {
                     const SizedBox(height: AppSpacing.md),
                     Text(
                       'Your real-time GPS location\n(Accurate to 5m) is being transmitted.',
-                      style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+                      style: AppTypography.bodySmall.copyWith(color: isDark ? Colors.white70 : AppColors.textSecondary),
                       textAlign: TextAlign.center,
                     ),
                   ],
