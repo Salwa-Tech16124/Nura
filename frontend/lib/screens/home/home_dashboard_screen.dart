@@ -66,7 +66,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                             Text(
                               'Sarah Jenkins',
                               style: AppTypography.h3.copyWith(
-                                color: const Color(0xFF1E244A),
+                                color: isDark ? Colors.white : const Color(0xFF1E244A),
                                 fontWeight: FontWeight.w900,
                                 fontSize: 18,
                               ),
@@ -74,7 +74,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                             Text(
                               'Patient',
                               style: AppTypography.bodySmall.copyWith(
-                                color: Colors.black54,
+                                color: isDark ? Colors.white60 : Colors.black54,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -87,11 +87,11 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: isDark ? const Color(0xFF1E244A) : Colors.white,
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withAlpha(15),
+                            color: isDark ? Colors.white10 : Colors.black.withAlpha(15),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -100,9 +100,9 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.notifications_none_outlined,
-                            color: Color(0xFF1E244A),
+                            color: isDark ? Colors.white : const Color(0xFF1E244A),
                             size: 24,
                           ),
                           Positioned(
@@ -134,7 +134,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     Text(
                       'How do you feel today?',
                       style: AppTypography.bodyLarge.copyWith(
-                        color: const Color(0xFF1E244A),
+                        color: isDark ? Colors.white : const Color(0xFF1E244A),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -231,14 +231,14 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     Text(
                       'Self-care',
                       style: AppTypography.h2.copyWith(
-                        color: const Color(0xFF1E244A),
+                        color: isDark ? Colors.white : const Color(0xFF1E244A),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Row(
                       children: [
-                        _buildTabButton('Practices', true),
+                        _buildTabButton('Practices', true, isDark: isDark),
                       ],
                     ),
                     const SizedBox(height: AppSpacing.md),
@@ -431,6 +431,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   // Helper builder for mood selection cards
   Widget _buildMoodCard(int index, String label, Color bgColor, Color themeColor) {
     bool isSelected = _selectedMoodIndex == index;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: () => setState(() => _selectedMoodIndex = index),
       child: AnimatedContainer(
@@ -438,15 +439,15 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
         width: 104,
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? const Color(0xFF1E244A) : Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? themeColor : Colors.transparent,
+            color: isSelected ? themeColor : (isDark ? Colors.white24 : Colors.transparent),
             width: 2.0,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(isSelected ? 20 : 8),
+              color: isDark ? Colors.white10 : Colors.black.withAlpha(isSelected ? 20 : 8),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -459,7 +460,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
             Text(
               label,
               style: TextStyle(
-                color: const Color(0xFF1E244A),
+                color: isDark ? Colors.white : const Color(0xFF1E244A),
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
                 fontSize: 14,
               ),
@@ -607,18 +608,22 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   }
 
   // Builder for tab buttons
-  Widget _buildTabButton(String label, bool isSelected) {
+  Widget _buildTabButton(String label, bool isSelected, {required bool isDark}) {
     return Container(
       margin: const EdgeInsets.only(right: AppSpacing.sm),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: isSelected ? const Color(0xFFD3B6FC).withAlpha(100) : const Color(0xFFF4F6F8),
+        color: isSelected 
+            ? const Color(0xFFD3B6FC).withAlpha(100) 
+            : (isDark ? Colors.white.withAlpha(20) : const Color(0xFFF4F6F8)),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
         label,
         style: TextStyle(
-          color: isSelected ? const Color(0xFF6A1B9A) : Colors.black87,
+          color: isSelected 
+              ? (isDark ? const Color(0xFFE1BEE7) : const Color(0xFF6A1B9A)) 
+              : (isDark ? Colors.white70 : Colors.black87),
           fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
           fontSize: 13,
         ),
