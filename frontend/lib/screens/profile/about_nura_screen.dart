@@ -230,32 +230,16 @@ class AboutNuraScreen extends StatelessWidget {
             const SizedBox(height: AppSpacing.md),
             SecondaryButton(
               text: 'Rate NURA',
-              onPressed: () {
-                showDialog(
+              onPressed: () async {
+                final rating = await showDialog<int>(
                   context: context,
-                  builder: (ctx) => AlertDialog(
-                    title: const Text('Rate NURA'),
-                    content: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(5, (index) => const Icon(Icons.star, color: Colors.amber, size: 36)),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(ctx).pop(),
-                        child: const Text('Cancel'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(ctx).pop();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Thank you for rating NURA!')),
-                          );
-                        },
-                        child: const Text('Submit'),
-                      ),
-                    ],
-                  ),
+                  builder: (ctx) => const _InteractiveRatingDialog(),
                 );
+                if (rating != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Thank you for giving us $rating stars!')),
+                  );
+                }
               },
             ),
             const SizedBox(height: AppSpacing.md),
@@ -270,6 +254,55 @@ class AboutNuraScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _InteractiveRatingDialog extends StatefulWidget {
+  const _InteractiveRatingDialog();
+
+  @override
+  State<_InteractiveRatingDialog> createState() => _InteractiveRatingDialogState();
+}
+
+class _InteractiveRatingDialogState extends State<_InteractiveRatingDialog> {
+  int _rating = 5;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Rate NURA'),
+      content: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: List.generate(5, (index) {
+          final starIndex = index + 1;
+          return IconButton(
+            icon: Icon(
+              starIndex <= _rating ? Icons.star : Icons.star_border,
+              color: Colors.amber,
+              size: 32,
+            ),
+            onPressed: () {
+              setState(() {
+                _rating = starIndex;
+              });
+            },
+          );
+        }),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop(_rating);
+          },
+          child: const Text('Submit'),
+        ),
+      ],
     );
   }
 }

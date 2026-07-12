@@ -10,6 +10,7 @@ class PreferenceTile extends StatefulWidget {
   final bool? isToggle;
   final bool toggleValue;
   final ValueChanged<bool>? onToggleChanged;
+  final VoidCallback? onTap;
 
   const PreferenceTile({
     super.key,
@@ -19,6 +20,7 @@ class PreferenceTile extends StatefulWidget {
     this.isToggle = false,
     this.toggleValue = false,
     this.onToggleChanged,
+    this.onTap,
   });
 
   @override
@@ -45,7 +47,7 @@ class _PreferenceTileState extends State<PreferenceTile> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Padding(
+    Widget content = Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -86,15 +88,37 @@ class _PreferenceTileState extends State<PreferenceTile> {
               activeColor: AppColors.primary,
             )
           else if (widget.value != null)
-            Text(
-              widget.value!, 
-              style: AppTypography.bodyMedium.copyWith(
-                color: isDark ? Colors.white70 : AppColors.textSecondary, 
-                fontWeight: FontWeight.bold,
-              ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  widget.value!, 
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: isDark ? Colors.white70 : AppColors.textSecondary, 
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                if (widget.onTap != null) ...[
+                  const SizedBox(width: 4),
+                  Icon(
+                    Icons.chevron_right, 
+                    size: 16, 
+                    color: isDark ? Colors.white54 : AppColors.textSecondary,
+                  ),
+                ],
+              ],
             ),
         ],
       ),
     );
+
+    if (widget.onTap != null && widget.isToggle != true) {
+      return GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: widget.onTap,
+        child: content,
+      );
+    }
+    return content;
   }
 }
