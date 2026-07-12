@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants/app_spacing.dart';
+import '../../core/providers/theme_provider.dart';
 import '../../widgets/layout/page_container.dart';
 import 'widgets/profile_header_card.dart';
 import 'widgets/personal_info_card.dart';
 import 'widgets/contact_profile_card.dart';
 import 'widgets/quick_action_card.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(String title, {required bool isDark}) {
     return Padding(
       padding: const EdgeInsets.only(top: AppSpacing.lg, bottom: AppSpacing.sm),
       child: Text(
         title,
-        style: const TextStyle(
-          color: Colors.black,
+        style: TextStyle(
+          color: isDark ? Colors.white : Colors.black,
           fontSize: 16,
           fontWeight: FontWeight.w900,
         ),
@@ -25,14 +27,17 @@ class ProfileScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeModeProvider);
+    final isDark = themeMode == ThemeMode.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFE8F1F5), // Light sky-blue neobrutalist backdrop
+      backgroundColor: isDark ? const Color(0xFF0A0C16) : const Color(0xFFE8F1F5), // Dynamic neobrutalist backdrop
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'My Profile', 
           style: TextStyle(
-            color: Colors.black, 
+            color: isDark ? Colors.white : Colors.black, 
             fontWeight: FontWeight.w900, 
             fontSize: 20,
           ),
@@ -41,7 +46,7 @@ class ProfileScreen extends StatelessWidget {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, color: isDark ? Colors.white : Colors.black, size: 20),
           onPressed: () => context.go('/home'),
         ),
       ),
@@ -50,10 +55,10 @@ class ProfileScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const SizedBox(height: AppSpacing.sm),
-            const Text(
+            Text(
               'Manage your personal information and healthcare profile.', 
               style: TextStyle(
-                color: Colors.black87, 
+                color: isDark ? Colors.white70 : Colors.black87, 
                 fontSize: 14, 
                 fontWeight: FontWeight.bold,
               ),
@@ -65,13 +70,13 @@ class ProfileScreen extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: AppSpacing.lg),
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark ? const Color(0xFF121625) : Colors.white,
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: Colors.black, width: 1.8),
-                boxShadow: const [
+                border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
+                boxShadow: [
                   BoxShadow(
-                    color: Colors.black,
-                    offset: Offset(2, 4),
+                    color: isDark ? Colors.white10 : Colors.black,
+                    offset: const Offset(2, 4),
                   )
                 ],
               ),
@@ -87,21 +92,21 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  const Text(
+                  Text(
                     'Your Medical Profile Details',
                     style: TextStyle(
                       fontWeight: FontWeight.w900,
-                      color: Colors.black,
+                      color: isDark ? Colors.white : Colors.black,
                       fontSize: 16,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: AppSpacing.xs),
-                  const Text(
+                  Text(
                     'Connect with doctors, manage caregivers, and log history.',
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      color: Colors.black54,
+                      color: isDark ? Colors.white70 : Colors.black54,
                       fontSize: 13,
                     ),
                     textAlign: TextAlign.center,
@@ -121,7 +126,7 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: AppSpacing.xl),
 
             // Section 2: Personal Information (Lilac background)
-            _buildSectionHeader('Personal Information'),
+            _buildSectionHeader('Personal Information', isDark: isDark),
             const PersonalInfoCard(
               backgroundColor: Color(0xFFE5D5FF), // Lilac
               infoData: {
@@ -136,7 +141,7 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: AppSpacing.xl),
 
             // Section 3: Health Information (Soft Pink background)
-            _buildSectionHeader('Health Information'),
+            _buildSectionHeader('Health Information', isDark: isDark),
             const PersonalInfoCard(
               backgroundColor: Color(0xFFFDCBE0), // Soft Pink
               infoData: {
@@ -149,7 +154,7 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: AppSpacing.xl),
 
             // Section 4: Emergency Contacts (Vibrant Green background)
-            _buildSectionHeader('Emergency Contacts'),
+            _buildSectionHeader('Emergency Contacts', isDark: isDark),
             ContactProfileCard(
               name: 'Sarah Doe',
               relationship: 'Daughter',
@@ -166,7 +171,19 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: AppSpacing.xl),
 
             // Section 5: Quick Actions (White with outlined pastel icon dots)
-            _buildSectionHeader('Quick Actions'),
+            _buildSectionHeader('Quick Actions', isDark: isDark),
+            
+            // Dynamic Theme Mode Switch Action
+            QuickActionCard(
+              title: isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode', 
+              icon: isDark ? Icons.light_mode : Icons.dark_mode, 
+              iconBgColor: isDark ? const Color(0xFFFED782) : const Color(0xFF37474F),
+              onTap: () {
+                ref.read(themeModeProvider.notifier).state = isDark ? ThemeMode.light : ThemeMode.dark;
+              },
+            ),
+            const SizedBox(height: AppSpacing.md),
+
             QuickActionCard(
               title: 'Health Profile', 
               icon: Icons.health_and_safety, 
@@ -218,11 +235,11 @@ class ProfileScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: const Color(0xFFC2F3F8), // Cyan neobrutalist
                 borderRadius: BorderRadius.circular(28),
-                border: Border.all(color: Colors.black, width: 1.8),
-                boxShadow: const [
+                border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
+                boxShadow: [
                   BoxShadow(
-                    color: Colors.black,
-                    offset: Offset(2, 4),
+                    color: isDark ? Colors.white10 : Colors.black,
+                    offset: const Offset(2, 4),
                   ),
                 ],
               ),
@@ -253,11 +270,11 @@ class ProfileScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: const Color(0xFFFDCBE0), // Pink neobrutalist
                 borderRadius: BorderRadius.circular(28),
-                border: Border.all(color: Colors.black, width: 1.8),
-                boxShadow: const [
+                border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
+                boxShadow: [
                   BoxShadow(
-                    color: Colors.black,
-                    offset: Offset(2, 4),
+                    color: isDark ? Colors.white10 : Colors.black,
+                    offset: const Offset(2, 4),
                   ),
                 ],
               ),
