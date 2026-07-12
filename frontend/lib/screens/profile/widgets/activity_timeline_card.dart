@@ -16,6 +16,7 @@ class ActivityTimelineCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return BaseCard(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -24,8 +25,8 @@ class ActivityTimelineCard extends StatelessWidget {
             width: 12,
             height: 12,
             margin: const EdgeInsets.only(top: 4),
-            decoration: const BoxDecoration(
-              color: AppColors.primary,
+            decoration: BoxDecoration(
+              color: isDark ? Colors.white : AppColors.primary,
               shape: BoxShape.circle,
             ),
           ),
@@ -34,9 +35,20 @@ class ActivityTimelineCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(time, style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary, fontWeight: FontWeight.bold)),
+                Text(
+                  time, 
+                  style: AppTypography.bodySmall.copyWith(
+                    color: isDark ? Colors.white54 : AppColors.textSecondary, 
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: AppSpacing.xs),
-                Text(description, style: AppTypography.bodyMedium),
+                Text(
+                  description, 
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: isDark ? Colors.white : null,
+                  ),
+                ),
               ],
             ),
           ),
