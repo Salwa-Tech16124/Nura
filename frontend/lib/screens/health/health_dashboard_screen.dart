@@ -1,10 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants/app_spacing.dart';
 import '../../widgets/layout/page_container.dart';
+import '../../features/health/providers/health_logs_provider.dart';
+import '../../features/health/models/health_log.dart';
 
-class HealthDashboardScreen extends StatelessWidget {
+class HealthDashboardScreen extends ConsumerStatefulWidget {
   const HealthDashboardScreen({super.key});
+
+  @override
+  ConsumerState<HealthDashboardScreen> createState() =>
+      _HealthDashboardScreenState();
+}
+
+class _HealthDashboardScreenState
+    extends ConsumerState<HealthDashboardScreen> {
+  final _bpCtrl = TextEditingController();
+  final _bsCtrl = TextEditingController();
+  final _wtCtrl = TextEditingController();
+
+  @override
+  void dispose() {
+    _bpCtrl.dispose();
+    _bsCtrl.dispose();
+    _wtCtrl.dispose();
+    super.dispose();
+  }
 
   Widget _buildVitalsCard(
     BuildContext context, {
@@ -68,7 +90,12 @@ class HealthDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSaveRow(BuildContext context, String hintText) {
+  Widget _buildSaveRow(
+    BuildContext context,
+    String hintText, {
+    required TextEditingController controller,
+    required String metricType,
+  }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(
       children: [
@@ -79,13 +106,23 @@ class HealthDashboardScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: isDark ? Colors.white.withAlpha(10) : Colors.white,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: isDark ? Colors.white24 : Colors.black.withAlpha(25), width: 1.2),
+              border: Border.all(
+                  color: isDark
+                      ? Colors.white24
+                      : Colors.black.withAlpha(25),
+                  width: 1.2),
             ),
             child: TextField(
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
+              controller: controller,
+              style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : Colors.black87),
               decoration: InputDecoration(
                 hintText: hintText,
-                hintStyle: TextStyle(color: isDark ? Colors.white38 : Colors.black38, fontSize: 13),
+                hintStyle: TextStyle(
+                    color: isDark ? Colors.white38 : Colors.black38,
+                    fontSize: 13),
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.zero,
               ),
@@ -93,13 +130,13 @@ class HealthDashboardScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(width: AppSpacing.sm),
-        // Neobrutalist Save Button
         Container(
           height: 44,
           decoration: BoxDecoration(
-            color: const Color(0xFFC3F3C0), // Vibrant Green neobrutalist
+            color: const Color(0xFFC3F3C0),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
+            border: Border.all(
+                color: isDark ? Colors.white24 : Colors.black, width: 1.8),
             boxShadow: [
               BoxShadow(
                 color: isDark ? Colors.white10 : Colors.black,
@@ -111,19 +148,41 @@ class HealthDashboardScreen extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.transparent,
               shadowColor: Colors.transparent,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
               padding: const EdgeInsets.symmetric(horizontal: 20),
             ),
-            onPressed: () {},
+            onPressed: () {
+              final value = controller.text.trim();
+              if (value.isNotEmpty) {
+                ref.read(healthLogsProvider.notifier).add(
+                      HealthLog(
+                        metricType: metricType,
+                        value: value,
+                        loggedAt: DateTime.now(),
+                      ),
+                    );
+                controller.clear();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                      content:
+                          Text('$metricType saved!')),
+                );
+              }
+            },
             child: const Text(
-              'Save', 
-              style: TextStyle(fontWeight: FontWeight.w900, color: Colors.black, fontSize: 14),
+              'Save',
+              style: TextStyle(
+                  fontWeight: FontWeight.w900,
+                  color: Colors.black,
+                  fontSize: 14),
             ),
           ),
         ),
       ],
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -209,22 +268,25 @@ class HealthDashboardScreen extends StatelessWidget {
                 context,
                 title: 'Blood Pressure',
                 icon: Icons.favorite_border_rounded,
-                iconBgColor: const Color(0xFFFDCBE0), // Pink
-                content: _buildSaveRow(context, 'e.g. 120/80'),
+                iconBgColor: const Color(0xFFFDCBE0),
+                content: _buildSaveRow(context, 'e.g. 120/80',
+                    controller: _bpCtrl, metricType: 'blood_pressure'),
               ),
               _buildVitalsCard(
                 context,
                 title: 'Blood Sugar',
                 icon: Icons.bloodtype_outlined,
-                iconBgColor: const Color(0xFFFED782), // Yellow
-                content: _buildSaveRow(context, 'e.g. 95 mg/dL'),
+                iconBgColor: const Color(0xFFFED782),
+                content: _buildSaveRow(context, 'e.g. 95 mg/dL',
+                    controller: _bsCtrl, metricType: 'blood_sugar'),
               ),
               _buildVitalsCard(
                 context,
                 title: 'Weight',
                 icon: Icons.monitor_weight_outlined,
-                iconBgColor: const Color(0xFFC2F3F8), // Cyan
-                content: _buildSaveRow(context, 'e.g. 170 lbs'),
+                iconBgColor: const Color(0xFFC2F3F8),
+                content: _buildSaveRow(context, 'e.g. 170 lbs',
+                    controller: _wtCtrl, metricType: 'weight'),
               ),
               _buildVitalsCard(
                 context,

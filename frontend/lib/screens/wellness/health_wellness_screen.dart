@@ -6,6 +6,10 @@ import '../../widgets/layout/page_container.dart';
 import '../../widgets/voice_wave_animation.dart';
 import '../../core/services/audio_service.dart';
 import '../../features/auth/providers/auth_state_provider.dart';
+import '../../features/timeline/providers/timeline_provider.dart';
+import '../../features/timeline/models/timeline_entry.dart';
+import '../../features/health/providers/health_logs_provider.dart';
+import '../../features/health/models/health_log.dart';
 
 class HealthWellnessScreen extends ConsumerStatefulWidget {
   const HealthWellnessScreen({super.key});
@@ -113,9 +117,64 @@ class _HealthWellnessScreenState extends ConsumerState<HealthWellnessScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      ref.read(timelineProvider.notifier).load();
+      ref.read(healthLogsProvider.notifier).load();
+    });
+  }
+
+  @override
   void dispose() {
     AudioService().stopVoicePlaySound();
     super.dispose();
+  }
+
+  // ---- Timeline helpers ----
+  String _formatTimestamp(DateTime dt) {
+    final now = DateTime.now();
+    final diff = now.difference(dt);
+    if (diff.inMinutes < 2) return 'Just Now';
+    if (diff.inHours < 1) return '${diff.inMinutes} min ago';
+    if (diff.inDays < 1) {
+      final h = dt.hour.toString().padLeft(2, '0');
+      final m = dt.minute.toString().padLeft(2, '0');
+      return '$h:$m ${dt.hour >= 12 ? 'PM' : 'AM'}';
+    }
+    if (diff.inDays == 1) return 'Yesterday';
+    if (diff.inDays < 7) return '${diff.inDays} Days Ago';
+    return '${dt.day}/${dt.month}/${dt.year}';
+  }
+
+  IconData _categoryToIcon(String category) {
+    switch (category.toLowerCase()) {
+      case 'medicine': return Icons.medication;
+      case 'vitals': return Icons.monitor_heart;
+      case 'blood_pressure': return Icons.monitor_heart;
+      case 'blood_sugar': return Icons.water_drop;
+      case 'sos': return Icons.warning_rounded;
+      case 'ai': return Icons.auto_awesome;
+      case 'report': return Icons.description_rounded;
+      case 'ocr': return Icons.qr_code_scanner;
+      case 'symptom': return Icons.edit_note_rounded;
+      default: return Icons.health_and_safety;
+    }
+  }
+
+  Color _categoryToColor(String category) {
+    switch (category.toLowerCase()) {
+      case 'medicine': return const Color(0xFF69F0AE);
+      case 'vitals': return const Color(0xFF40C4FF);
+      case 'blood_pressure': return const Color(0xFF40C4FF);
+      case 'blood_sugar': return const Color(0xFFFFAB40);
+      case 'sos': return const Color(0xFFFF5252);
+      case 'ai': return const Color(0xFF81C784);
+      case 'report': return const Color(0xFFFED782);
+      case 'ocr': return const Color(0xFFFBB584);
+      case 'symptom': return const Color(0xFFFFD740);
+      default: return const Color(0xFFD3B6FC);
+    }
   }
 
   // 4. Medicine Scanner Simulation States
@@ -246,8 +305,19 @@ class _HealthWellnessScreenState extends ConsumerState<HealthWellnessScreen> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusPill)),
               ),
               onPressed: () {
-                onSave(controller.text);
+                final value = controller.text.trim();
+                onSave(value);
                 Navigator.pop(context);
+                // Log to backend
+                if (value.isNotEmpty) {
+                  ref.read(healthLogsProvider.notifier).add(
+                    HealthLog(
+                      metricType: title,
+                      value: value,
+                      loggedAt: DateTime.now(),
+                    ),
+                  );
+                }
               },
               child: const Text('Save', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
             ),
@@ -525,14 +595,47 @@ class _HealthWellnessScreenState extends ConsumerState<HealthWellnessScreen> {
 
               // AI Health Timeline
               _buildSectionHeader(context, 'AI Health Timeline'),
-              _buildNeobrutalistCard(
-                context,
-                backgroundColor: Colors.white,
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.xs),
-                  child: Column(
-                    children: List.generate(_timelineEvents.length, (index) {
-                      return _buildTimelineEventCard(_timelineEvents[index], index == _timelineEvents.length - 1);
+              RefreshIndicator(
+                onRefresh: () => ref.read(timelineProvider.notifier).load(),
+                child: _buildNeobrutalistCard(
+                  context,
+                  backgroundColor: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.xs),
+                    child: Builder(builder: (ctx) {
+                      final tlState = ref.watch(timelineProvider);
+                      if (tlState.isLoading) {
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 32),
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      }
+                      // Map API entries to display maps (fallback to mock if empty)
+                      final apiEvents = tlState.entries.map((TimelineEntry e) => {
+                        'time': _formatTimestamp(e.timestamp),
+                        'title': e.title,
+                        'subtitle': e.subtitle,
+                        'icon': _categoryToIcon(e.category),
+                        'color': _categoryToColor(e.category),
+                      }).toList();
+                      final events = apiEvents.isNotEmpty ? apiEvents : _timelineEvents;
+                      if (events.isEmpty) {
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 32),
+                          child: Center(
+                            child: Text(
+                              'No timeline events yet.',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        );
+                      }
+                      return Column(
+                        children: List.generate(events.length, (index) {
+                          return _buildTimelineEventCard(
+                            events[index], index == events.length - 1);
+                        }),
+                      );
                     }),
                   ),
                 ),
@@ -933,7 +1036,7 @@ class _HealthWellnessScreenState extends ConsumerState<HealthWellnessScreen> {
                           ),
                         ),
                       );
-                    }).toList(),
+                    }),
                   ],
                 ),
               ),

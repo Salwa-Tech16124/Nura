@@ -1,35 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../widgets/layout/page_container.dart';
 import '../../core/constants/app_spacing.dart';
+import '../../features/medicine/providers/medicine_provider.dart';
 
-class MedicationDashboardScreen extends StatefulWidget {
+class MedicationDashboardScreen extends ConsumerStatefulWidget {
   const MedicationDashboardScreen({super.key});
 
   @override
-  State<MedicationDashboardScreen> createState() => _MedicationDashboardScreenState();
+  ConsumerState<MedicationDashboardScreen> createState() => _MedicationDashboardScreenState();
 }
 
-class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
-  final bool _hasMedicines = true; // Toggle for empty state testing
-  
-  final List<Map<String, dynamic>> _upcomingMedicines = [
-    {
-      'name': 'Lisinopril 10mg',
-      'time': '9:00 AM',
-      'status': 'Pending',
-    },
-    {
-      'name': 'Vitamin D',
-      'time': '2:00 PM',
-      'status': 'Upcoming',
-    },
-    {
-      'name': 'Metformin 500mg',
-      'time': '8:00 PM',
-      'status': 'Upcoming',
-    }
-  ];
+class _MedicationDashboardScreenState extends ConsumerState<MedicationDashboardScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() => ref.read(medicineProvider.notifier).load());
+  }
+
 
   // Local helper for section headers
   Widget _buildSectionHeader(String title, {required bool isDark}) {
@@ -202,6 +191,8 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final medState = ref.watch(medicineProvider);
+    final hasMedicines = medState.medicines.isNotEmpty || medState.isLoading;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0A0C16) : const Color(0xFFE8F1F5), // Dynamic neobrutalist background
@@ -303,7 +294,7 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
               ),
             ),
 
-            if (!_hasMedicines) ...[
+            if (!hasMedicines) ...[
               const SizedBox(height: AppSpacing.xxl),
               Center(
                 child: Container(
@@ -354,17 +345,16 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '2 of 5 medicines taken today', 
+                          '${medState.medicines.length} medicine(s) scheduled today',
                           style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black87, fontSize: 13),
                         ),
                         Text(
-                          '40% Completed', 
+                          'Active',
                           style: TextStyle(fontWeight: FontWeight.w900, color: isDark ? Colors.white : Colors.black, fontSize: 13),
                         ),
                       ],
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    // Outlined neobrutalist progress bar
                     Container(
                       height: 12,
                       width: double.infinity,
@@ -375,10 +365,10 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
                       ),
                       child: FractionallySizedBox(
                         alignment: Alignment.centerLeft,
-                        widthFactor: 0.4,
+                        widthFactor: medState.medicines.isEmpty ? 0.0 : (medState.medicines.where((m) => m.isActive).length / medState.medicines.length),
                         child: Container(
                           decoration: BoxDecoration(
-                            color: const Color(0xFFC2F3F8), // Cyan progress fill
+                            color: const Color(0xFFC2F3F8),
                             borderRadius: BorderRadius.circular(5),
                           ),
                         ),
@@ -391,20 +381,12 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
 
               // Today's Medication Card
               _buildSectionHeader('Today\'s Medication', isDark: isDark),
-              _buildNeobrutalistMedicineCard(
-                context,
-                name: 'Lisinopril 10mg',
-                dosage: '1 Pill',
-                time: '9:00 AM',
-                icon: Icons.medication,
-                iconBgColor: const Color(0xFFC2F3F8), // Cyan
-                statusBadge: _buildNeobrutalistStatusBadge('Pending'),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-
-              // Upcoming Medicines Timeline
-              _buildSectionHeader('Upcoming Medicines', isDark: isDark),
-              if (_upcomingMedicines.isEmpty)
+              if (medState.isLoading)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 24),
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              else if (medState.medicines.isEmpty)
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.md),
                   decoration: BoxDecoration(
@@ -412,22 +394,53 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
                   ),
-                  child: Text('No upcoming medicines.', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black)),
+                  child: Text('No medicines scheduled.',
+                    style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black)),
                 )
               else
-                ...List.generate(_upcomingMedicines.length, (index) {
-                  return _buildTimelineCard(context, _upcomingMedicines[index], index == _upcomingMedicines.length - 1);
+                _buildNeobrutalistMedicineCard(
+                  context,
+                  name: medState.medicines.first.name,
+                  dosage: medState.medicines.first.dosage,
+                  time: medState.medicines.first.time ?? 'Anytime',
+                  icon: Icons.medication,
+                  iconBgColor: const Color(0xFFC2F3F8),
+                  statusBadge: _buildNeobrutalistStatusBadge(
+                    medState.medicines.first.isActive ? 'Pending' : 'Inactive'),
+                ),
+              const SizedBox(height: AppSpacing.lg),
+
+              // Upcoming Medicines Timeline
+              _buildSectionHeader('Upcoming Medicines', isDark: isDark),
+              if (medState.medicines.isEmpty)
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF121625) : Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
+                  ),
+                  child: Text('No upcoming medicines.',
+                    style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black)),
+                )
+              else
+                ...List.generate(medState.medicines.length, (index) {
+                  final m = medState.medicines[index];
+                  return _buildTimelineCard(
+                    context,
+                    {'name': m.name, 'time': m.time ?? 'Anytime', 'status': m.isActive ? 'Upcoming' : 'Inactive'},
+                    index == medState.medicines.length - 1,
+                  );
                 }),
               const SizedBox(height: AppSpacing.lg),
 
               // Quick Actions
-              // 1. Log Medicine Taken Button (Cyan solid neobrutalist)
               Container(
                 width: double.infinity,
                 height: 52,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(28),
-                  color: const Color(0xFFC2F3F8), // Cyan
+                  color: const Color(0xFFC2F3F8),
                   border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
                   boxShadow: [
                     BoxShadow(
@@ -440,30 +453,20 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
                     shadowColor: Colors.transparent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(28),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
                   ),
                   onPressed: () => context.push('/meds-notification'),
-                  child: const Text(
-                    'Log Medicine Taken',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
+                  child: const Text('Log Medicine Taken',
+                    style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
-              // 2. View Medication History Button (Pink solid neobrutalist)
               Container(
                 width: double.infinity,
                 height: 52,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(28),
-                  color: const Color(0xFFFDCBE0), // Pink
+                  color: const Color(0xFFFDCBE0),
                   border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
                   boxShadow: [
                     BoxShadow(
@@ -476,29 +479,20 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
                     shadowColor: Colors.transparent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(28),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
                   ),
                   onPressed: () => context.push('/meds-history'),
-                  child: const Text(
-                    'View Medication History',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
+                  child: const Text('View Medication History',
+                    style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
                 ),
               ),
               const SizedBox(height: AppSpacing.xl),
 
-              // Reminder Status Card (Yellow background neobrutalist)
+              // Reminder Status Card
               Container(
                 padding: const EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFED782), // Soft Yellow
+                  color: const Color(0xFFFED782),
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
                   boxShadow: [
@@ -520,35 +514,22 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
                         border: Border.all(color: Colors.black, width: 1.8),
                       ),
                       child: const Center(
-                        child: Icon(
-                          Icons.info_outline_rounded,
-                          color: Colors.black,
-                          size: 22,
-                        ),
+                        child: Icon(Icons.info_outline_rounded, color: Colors.black, size: 22),
                       ),
                     ),
                     const SizedBox(width: AppSpacing.md),
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          const Text('Reminder Status',
+                            style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: 16)),
+                          const SizedBox(height: AppSpacing.xs),
                           Text(
-                            'Reminder Status',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w900,
-                              fontSize: 16,
-                            ),
-                          ),
-                          SizedBox(height: AppSpacing.xs),
-                          Text(
-                            'Your next medication is scheduled for 2:00 PM.',
-                            style: TextStyle(
-                              color: Colors.black87,
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              height: 1.4,
-                            ),
+                            medState.medicines.isEmpty
+                              ? 'No upcoming medications scheduled.'
+                              : 'Next: ${medState.medicines.first.name} at ${medState.medicines.first.time ?? "Anytime"}.',
+                            style: const TextStyle(color: Colors.black87, fontSize: 13, fontWeight: FontWeight.bold, height: 1.4),
                           ),
                         ],
                       ),
