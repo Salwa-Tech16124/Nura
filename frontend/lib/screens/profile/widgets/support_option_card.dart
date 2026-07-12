@@ -7,30 +7,35 @@ import '../../../../widgets/cards.dart';
 class SupportOptionCard extends StatelessWidget {
   final String title;
   final IconData icon;
+  final VoidCallback? onTap;
 
   const SupportOptionCard({
     super.key,
     required this.title,
     required this.icon,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return BaseCard(
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.sm),
-            decoration: BoxDecoration(
-              color: AppColors.primaryLight,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+    return GestureDetector(
+      onTap: onTap,
+      child: BaseCard(
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.sm),
+              decoration: BoxDecoration(
+                color: AppColors.primaryLight,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+              ),
+              child: Icon(icon, color: AppColors.primary, size: 24),
             ),
-            child: Icon(icon, color: AppColors.primary, size: 24),
-          ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(child: Text(title, style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold))),
-          const Icon(Icons.chevron_right, color: AppColors.textSecondary),
-        ],
+            const SizedBox(width: AppSpacing.md),
+            Expanded(child: Text(title, style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold))),
+            const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+          ],
+        ),
       ),
     );
   }

@@ -83,41 +83,44 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                       ],
                     ),
                     // Notification bell with red dot badge
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF1E244A) : Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: isDark ? Colors.white10 : Colors.black.withAlpha(15),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Icon(
-                            Icons.notifications_none_outlined,
-                            color: isDark ? Colors.white : const Color(0xFF1E244A),
-                            size: 24,
-                          ),
-                          Positioned(
-                            top: 12,
-                            right: 12,
-                            child: Container(
-                              width: 8,
-                              height: 8,
-                              decoration: const BoxDecoration(
-                                color: Colors.redAccent,
-                                shape: BoxShape.circle,
+                    GestureDetector(
+                      onTap: () => context.push('/meds-notification'),
+                      child: Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0xFF1E244A) : Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: isDark ? Colors.white10 : Colors.black.withAlpha(15),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Icon(
+                              Icons.notifications_none_outlined,
+                              color: isDark ? Colors.white : const Color(0xFF1E244A),
+                              size: 24,
+                            ),
+                            Positioned(
+                              top: 12,
+                              right: 12,
+                              child: Container(
+                                width: 8,
+                                height: 8,
+                                decoration: const BoxDecoration(
+                                  color: Colors.redAccent,
+                                  shape: BoxShape.circle,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -405,7 +408,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                             borderRadius: BorderRadius.circular(28),
                           ),
                         ),
-                        onPressed: () => context.push('/sos'),
+                        onPressed: () => context.push('/sos-activation'),
                         child: const Text(
                           'Emergency SOS',
                           style: TextStyle(

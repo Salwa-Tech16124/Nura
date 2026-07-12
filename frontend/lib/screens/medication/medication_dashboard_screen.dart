@@ -444,7 +444,7 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
                       borderRadius: BorderRadius.circular(28),
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () => context.push('/meds-notification'),
                   child: const Text(
                     'Log Medicine Taken',
                     style: TextStyle(
@@ -480,7 +480,7 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
                       borderRadius: BorderRadius.circular(28),
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () => context.push('/meds-history'),
                   child: const Text(
                     'View Medication History',
                     style: TextStyle(

@@ -14,13 +14,21 @@ class HealthRiskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return BaseCard(
-      backgroundColor: AppColors.warningLight,
+      backgroundColor: isDark ? const Color(0xFF2A1A00) : AppColors.warningLight,
       child: Row(
         children: [
           const Icon(Icons.info_outline, color: AppColors.warning, size: 24),
           const SizedBox(width: AppSpacing.md),
-          Expanded(child: Text(title, style: AppTypography.bodyMedium)),
+          Expanded(
+            child: Text(
+              title,
+              style: AppTypography.bodyMedium.copyWith(
+                color: isDark ? Colors.white : null,
+              ),
+            ),
+          ),
         ],
       ),
     );

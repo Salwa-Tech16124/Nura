@@ -11,6 +11,22 @@ import 'widgets/support_option_card.dart';
 import 'widgets/roadmap_card.dart';
 import '../../widgets/navigation.dart';
 
+void _showInfoDialog(BuildContext context, String title, String message) {
+  showDialog(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: Text(title),
+      content: Text(message),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(),
+          child: const Text('Close'),
+        ),
+      ],
+    ),
+  );
+}
+
 class AboutNuraScreen extends StatelessWidget {
   const AboutNuraScreen({super.key});
 
@@ -85,28 +101,68 @@ class AboutNuraScreen extends StatelessWidget {
 
             // Section 3: Help & Support
             const SectionHeader(title: 'Help & Support'),
-            const SupportOptionCard(title: 'Help Center', icon: Icons.help_center),
+            SupportOptionCard(
+              title: 'Help Center',
+              icon: Icons.help_center,
+              onTap: () => _showInfoDialog(context, 'Help Center', 'Visit our Help Center at nura.health/help for guides and tutorials on using the NURA app.'),
+            ),
             const SizedBox(height: AppSpacing.sm),
-            const SupportOptionCard(title: 'FAQs', icon: Icons.question_answer),
+            SupportOptionCard(
+              title: 'FAQs',
+              icon: Icons.question_answer,
+              onTap: () => _showInfoDialog(context, 'FAQs', 'Frequently Asked Questions:\n\n• How do I add a medication?\n• How do I invite a caregiver?\n• How do I use Voice AI?\n\nVisit nura.health/faq for full list.'),
+            ),
             const SizedBox(height: AppSpacing.sm),
-            const SupportOptionCard(title: 'Contact Support', icon: Icons.support_agent),
+            SupportOptionCard(
+              title: 'Contact Support',
+              icon: Icons.support_agent,
+              onTap: () => _showInfoDialog(context, 'Contact Support', 'Our support team is available 24/7.\n\nEmail: support@nura.health\nPhone: +1 800-NURA-CARE\nLive Chat: Available in the app.'),
+            ),
             const SizedBox(height: AppSpacing.sm),
-            const SupportOptionCard(title: 'Email Support', icon: Icons.email),
+            SupportOptionCard(
+              title: 'Email Support',
+              icon: Icons.email,
+              onTap: () => _showInfoDialog(context, 'Email Support', 'Send us an email at:\n\nsupport@nura.health\n\nWe respond within 24 hours on business days.'),
+            ),
             const SizedBox(height: AppSpacing.sm),
-            const SupportOptionCard(title: 'Report a Problem', icon: Icons.report_problem),
+            SupportOptionCard(
+              title: 'Report a Problem',
+              icon: Icons.report_problem,
+              onTap: () => _showInfoDialog(context, 'Report a Problem', 'Encountered a bug or issue?\n\nPlease describe the problem and send it to:\nbugs@nura.health\n\nThank you for helping us improve NURA!'),
+            ),
             const SizedBox(height: AppSpacing.sm),
-            const SupportOptionCard(title: 'Feedback', icon: Icons.feedback),
+            SupportOptionCard(
+              title: 'Feedback',
+              icon: Icons.feedback,
+              onTap: () => _showInfoDialog(context, 'Feedback', 'We love hearing from you!\n\nShare your feedback at:\nfeedback@nura.health\n\nYour input helps us make NURA better for everyone.'),
+            ),
             const SizedBox(height: AppSpacing.xl),
 
             // Section 4: Legal
             const SectionHeader(title: 'Legal'),
-            const SupportOptionCard(title: 'Privacy Policy', icon: Icons.privacy_tip),
+            SupportOptionCard(
+              title: 'Privacy Policy',
+              icon: Icons.privacy_tip,
+              onTap: () => _showInfoDialog(context, 'Privacy Policy', 'NURA respects your privacy. We collect only the health data you provide and never sell your information to third parties.\n\nFull policy: nura.health/privacy'),
+            ),
             const SizedBox(height: AppSpacing.sm),
-            const SupportOptionCard(title: 'Terms & Conditions', icon: Icons.gavel),
+            SupportOptionCard(
+              title: 'Terms & Conditions',
+              icon: Icons.gavel,
+              onTap: () => _showInfoDialog(context, 'Terms & Conditions', 'By using NURA, you agree to our Terms of Service. NURA is a health companion app and does not replace professional medical advice.\n\nFull terms: nura.health/terms'),
+            ),
             const SizedBox(height: AppSpacing.sm),
-            const SupportOptionCard(title: 'Open Source Licenses', icon: Icons.code),
+            SupportOptionCard(
+              title: 'Open Source Licenses',
+              icon: Icons.code,
+              onTap: () => _showInfoDialog(context, 'Open Source Licenses', 'NURA is built using open source software including Flutter, Riverpod, and GoRouter.\n\nFor full license details visit: nura.health/licenses'),
+            ),
             const SizedBox(height: AppSpacing.sm),
-            const SupportOptionCard(title: 'Data Usage Policy', icon: Icons.data_usage),
+            SupportOptionCard(
+              title: 'Data Usage Policy',
+              icon: Icons.data_usage,
+              onTap: () => _showInfoDialog(context, 'Data Usage Policy', 'Your health data is stored securely and used only to power NURA\'s AI features. You can delete your data at any time from Profile > Privacy & Security.\n\nFull policy: nura.health/data-usage'),
+            ),
             const SizedBox(height: AppSpacing.xl),
 
             // Section 5: Our Mission
