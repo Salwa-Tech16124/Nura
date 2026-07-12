@@ -8,6 +8,7 @@ import 'widgets/profile_header_card.dart';
 import 'widgets/personal_info_card.dart';
 import 'widgets/contact_profile_card.dart';
 import 'widgets/quick_action_card.dart';
+import '../../features/auth/providers/auth_state_provider.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -117,9 +118,11 @@ class ProfileScreen extends ConsumerWidget {
 
             // Section 1: Profile Card (Vibrant Cyan)
             ProfileHeaderCard(
-              name: 'Sarah Jenkins',
-              age: '34 Years',
-              gender: 'Female',
+              name: ref.watch(authStateProvider).user?.name ?? 'Sarah Jenkins',
+              age: ref.watch(authStateProvider).user?.age != null
+                  ? '${ref.watch(authStateProvider).user!.age} Years'
+                  : '34 Years',
+              gender: ref.watch(authStateProvider).user?.gender ?? 'Female',
               bloodGroup: 'O+',
               onEdit: () => context.push('/health-profile'),
             ),

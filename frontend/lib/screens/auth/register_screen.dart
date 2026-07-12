@@ -1,14 +1,132 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/constants/app_spacing.dart';
 import '../../widgets/layout/page_container.dart';
+import '../../features/auth/providers/auth_state_provider.dart';
+import '../../features/auth/providers/auth_state.dart';
+import '../../features/auth/models/register_request.dart';
+import 'login_screen.dart'; // To use DarkTextField and LoginWavePainter
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
   @override
+  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends ConsumerState<RegisterScreen> {
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleRegister(BuildContext context) async {
+    final name = _nameController.text.trim();
+    final email = _emailController.text.trim();
+    final phone = _phoneController.text.trim();
+    final password = _passwordController.text.trim();
+    final confirmPassword = _confirmPasswordController.text.trim();
+
+    if (name.isEmpty || email.isEmpty || phone.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fill out all fields'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Passwords do not match'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
+    try {
+      final request = RegisterRequest(
+        name: name,
+        email: email,
+        phoneNumber: phone,
+        password: password,
+      );
+
+      await ref.read(authStateProvider.notifier).register(request);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Registration successful! Please login.'),
+          backgroundColor: Color(0xFF2E7D32),
+        ),
+      );
+      context.go('/login');
+    } catch (e) {
+      if (!mounted) return;
+      final state = ref.read(authStateProvider);
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: const Color(0xFF1E244A),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: const BorderSide(color: Color(0xFFEC407A), width: 1.8),
+          ),
+          title: const Row(
+            children: [
+              Icon(Icons.error_outline, color: Color(0xFFEC407A), size: 28),
+              SizedBox(width: 10),
+              Text(
+                'Registration Failed',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 20,
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            state.errorMessage ?? 'An error occurred during registration.',
+            style: const TextStyle(color: Colors.white70, fontSize: 14),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                'OK',
+                style: TextStyle(color: Color(0xFFEC407A), fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authStateProvider);
+    final isLoading = authState.status == AuthStatus.loading;
+
     return Scaffold(
       backgroundColor: const Color(0xFF131124), // Premium dark theme body
       body: PageContainer(
@@ -120,28 +238,33 @@ class RegisterScreen extends StatelessWidget {
                   const SizedBox(height: AppSpacing.xl),
 
                   // Inputs
-                  const DarkTextField(
+                  DarkTextField(
+                    controller: _nameController,
                     hintText: 'Full Name',
                     prefixIcon: Icons.person_outline,
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  const DarkTextField(
+                  DarkTextField(
+                    controller: _emailController,
                     hintText: 'Email Address',
                     prefixIcon: Icons.email_outlined,
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  const DarkTextField(
+                  DarkTextField(
+                    controller: _phoneController,
                     hintText: 'Phone Number',
                     prefixIcon: Icons.phone_outlined,
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  const DarkTextField(
+                  DarkTextField(
+                    controller: _passwordController,
                     hintText: 'Password',
                     obscureText: true,
                     prefixIcon: Icons.lock_outline,
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  const DarkTextField(
+                  DarkTextField(
+                    controller: _confirmPasswordController,
                     hintText: 'Confirm Password',
                     obscureText: true,
                     prefixIcon: Icons.lock_outline,
@@ -178,16 +301,25 @@ class RegisterScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
                         ),
                       ),
-                      onPressed: () => context.go('/home'),
-                      child: const Text(
-                        'Create Account',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
+                      onPressed: isLoading ? null : () => _handleRegister(context),
+                      child: isLoading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text(
+                              'Create Account',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),

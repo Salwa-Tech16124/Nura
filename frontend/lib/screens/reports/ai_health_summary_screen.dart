@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants/app_spacing.dart';
 import '../../core/theme/app_colors.dart';
@@ -13,12 +14,13 @@ import 'widgets/observation_card.dart';
 import 'widgets/health_risk_card.dart';
 import 'widgets/goal_progress_card.dart';
 import '../../widgets/navigation.dart';
+import '../../features/auth/providers/auth_state_provider.dart';
 
-class AIHealthSummaryScreen extends StatelessWidget {
+class AIHealthSummaryScreen extends ConsumerWidget {
   const AIHealthSummaryScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0A0C16) : AppColors.background,
@@ -56,8 +58,8 @@ class AIHealthSummaryScreen extends StatelessWidget {
 
             // Section 2: AI Summary Card
             const SectionHeader(title: 'AI Summary Card'),
-            const InformationCard(
-              title: 'Hello John,',
+            InformationCard(
+              title: 'Hello ${ref.watch(authStateProvider).user?.name.split(' ').first ?? 'John'},',
               description: 'Based on your recent health records, your overall health is improving.\n\nYour medicine adherence has remained excellent.\n\nYour blood pressure and blood sugar levels have stayed within a healthy range.\n\nYour daily walking activity has increased compared to last month.\n\nKeep following your current routine.',
             ),
             const SizedBox(height: AppSpacing.xl),

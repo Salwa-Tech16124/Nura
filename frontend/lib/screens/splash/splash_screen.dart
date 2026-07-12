@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/constants/app_spacing.dart';
 import '../../core/services/audio_service.dart';
+import '../../core/services/secure_storage_service.dart';
+import '../../features/auth/providers/auth_state_provider.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
 
@@ -27,11 +30,27 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     // Play the startup sound once
     AudioService().playStartupSound();
 
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 3), () async {
       if (mounted) {
         // Stop sound when navigating away
         AudioService().stop();
-        context.go('/onboarding');
+        
+        final secureStorage = ref.read(secureStorageServiceProvider);
+        final authNotifier = ref.read(authStateProvider.notifier);
+        
+        final hasToken = await secureStorage.hasToken();
+        if (hasToken) {
+          final isValid = await authNotifier.checkAuthStatus();
+          if (mounted) {
+            if (isValid) {
+              context.go('/home');
+            } else {
+              context.go('/login');
+            }
+          }
+        } else {
+          context.go('/onboarding');
+        }
       }
     });
   }

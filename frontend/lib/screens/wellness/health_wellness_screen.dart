@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants/app_spacing.dart';
 import '../../widgets/layout/page_container.dart';
 import '../../widgets/voice_wave_animation.dart';
 import '../../core/services/audio_service.dart';
+import '../../features/auth/providers/auth_state_provider.dart';
 
-class HealthWellnessScreen extends StatefulWidget {
+class HealthWellnessScreen extends ConsumerStatefulWidget {
   const HealthWellnessScreen({super.key});
 
   @override
-  State<HealthWellnessScreen> createState() => _HealthWellnessScreenState();
+  ConsumerState<HealthWellnessScreen> createState() => _HealthWellnessScreenState();
 }
 
-class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
+class _HealthWellnessScreenState extends ConsumerState<HealthWellnessScreen> {
   // 1. Health Tracking State
   int _heartRate = 72;
   double _systolic = 120;
@@ -607,7 +609,7 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
                             ),
                             const Divider(height: 16, thickness: 1.5, color: Colors.black26),
                             const SizedBox(height: AppSpacing.xs),
-                            _buildOcrRow('Patient Name:', 'Sarah Jenkins'),
+                            _buildOcrRow('Patient Name:', ref.read(authStateProvider).user?.name ?? 'Sarah Jenkins'),
                             _buildOcrRow('Detected Med:', 'Lisinopril 10mg'),
                             _buildOcrRow('Dosage:', 'Take 1 tablet daily by mouth'),
                             _buildOcrRow('Confidence:', '98.4% (Verified)'),

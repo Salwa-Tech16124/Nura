@@ -1,18 +1,92 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/constants/app_spacing.dart';
 import '../../widgets/layout/page_container.dart';
+import '../../features/auth/providers/auth_state_provider.dart';
+import '../../features/auth/providers/auth_state.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _rememberMe = false;
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleLogin(BuildContext context) async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter email and password'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
+    await ref.read(authStateProvider.notifier).login(email, password);
+
+    if (!mounted) return;
+
+    final state = ref.read(authStateProvider);
+    if (state.status == AuthStatus.authenticated) {
+      context.go('/home');
+    } else if (state.status == AuthStatus.error) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: const Color(0xFF1E244A),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: const BorderSide(color: Color(0xFFEC407A), width: 1.8),
+          ),
+          title: const Row(
+            children: [
+              Icon(Icons.error_outline, color: Color(0xFFEC407A), size: 28),
+              SizedBox(width: 10),
+              Text(
+                'Login Failed',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 20,
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            state.errorMessage ?? 'An error occurred during login.',
+            style: const TextStyle(color: Colors.white70, fontSize: 14),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                'OK',
+                style: TextStyle(color: Color(0xFFEC407A), fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+  }
 
   void _showForgotPasswordDialog(BuildContext context) {
     final emailController = TextEditingController();
@@ -116,6 +190,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authStateProvider);
+    final isLoading = authState.status == AuthStatus.loading;
+
     return Scaffold(
       backgroundColor: const Color(0xFF131124), // Premium dark theme body
       body: PageContainer(
@@ -213,12 +290,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: AppSpacing.xl),
 
                   // Email and password form inputs
-                  const DarkTextField(
+                  DarkTextField(
+                    controller: _emailController,
                     hintText: 'Email Address',
                     prefixIcon: Icons.email_outlined,
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  const DarkTextField(
+                  DarkTextField(
+                    controller: _passwordController,
                     hintText: 'Password',
                     obscureText: true,
                     prefixIcon: Icons.lock_outline,
@@ -298,15 +377,24 @@ class _LoginScreenState extends State<LoginScreen> {
                           borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
                         ),
                       ),
-                      onPressed: () => context.go('/home'),
-                      child: const Text(
-                        'Sign in',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      onPressed: isLoading ? null : () => _handleLogin(context),
+                      child: isLoading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text(
+                              'Sign in',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),

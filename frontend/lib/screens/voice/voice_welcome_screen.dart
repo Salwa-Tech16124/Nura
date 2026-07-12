@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
 import '../../widgets/buttons.dart';
+import '../../features/auth/providers/auth_state_provider.dart';
 
 import 'dart:async';
 import 'dart:math' as math;
@@ -31,14 +33,14 @@ enum EyeExpression {
   wink,
 }
 
-class VoiceWelcomeScreen extends StatefulWidget {
+class VoiceWelcomeScreen extends ConsumerStatefulWidget {
   const VoiceWelcomeScreen({super.key});
 
   @override
-  State<VoiceWelcomeScreen> createState() => _VoiceWelcomeScreenState();
+  ConsumerState<VoiceWelcomeScreen> createState() => _VoiceWelcomeScreenState();
 }
 
-class _VoiceWelcomeScreenState extends State<VoiceWelcomeScreen> {
+class _VoiceWelcomeScreenState extends ConsumerState<VoiceWelcomeScreen> {
   final ValueNotifier<RobotTrigger?> _robotTriggerNotifier = ValueNotifier<RobotTrigger?>(null);
 
   void _onSuggestionTap(String suggestion) {
@@ -114,7 +116,7 @@ class _VoiceWelcomeScreenState extends State<VoiceWelcomeScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Hello John 👋',
+                            'Hello ${ref.watch(authStateProvider).user?.name.split(' ').first ?? 'John'} 👋',
                             style: AppTypography.bodyLarge.copyWith(
                               color: isDark ? Colors.white70 : Colors.black54,
                               fontWeight: FontWeight.bold,
@@ -382,7 +384,7 @@ class _AnimatedRobotState extends State<AnimatedRobot> with TickerProviderStateM
 
   // List of speech bubble messages to rotate
   final List<String> _idleMessages = [
-    "Hello John 👋",
+    "Hello 👋",
     "Namaste 🙏",
     "Welcome back!",
     "Let's talk 🎤",
@@ -589,10 +591,11 @@ class _AnimatedRobotState extends State<AnimatedRobot> with TickerProviderStateM
     await _animateWave(waves: 5);
     if (!mounted || _currentState == RobotState.actionTransition) return;
 
-    // Small bow & Hello John
+    // Small bow & Hello
+    final firstName = ref.read(authStateProvider).user?.name.split(' ').first ?? 'John';
     setState(() {
       _eyeExpression = EyeExpression.normal;
-      _bubbleText = "Hello John 👋";
+      _bubbleText = "Hello $firstName 👋";
       _headOffsetY = 2.0; // Bow head
       _headTilt = 0.08;
       _rightArmAngle = -0.3; // Hand on chest
