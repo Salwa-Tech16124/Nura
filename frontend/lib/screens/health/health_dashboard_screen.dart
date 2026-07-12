@@ -149,6 +149,56 @@ class HealthDashboardScreen extends StatelessWidget {
           child: Column(
             children: [
               const SizedBox(height: AppSpacing.sm),
+
+              // Top Dashboard Illustration Banner
+              Container(
+                margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+                padding: const EdgeInsets.all(AppSpacing.md),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: Colors.black, width: 1.8),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black,
+                      offset: Offset(2, 4),
+                    )
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Image.asset(
+                        'assets/images/branding/health_illustration.jpg',
+                        height: 145,
+                        width: double.infinity,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    const Text(
+                      'Your Personal Health Tracker',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        color: Colors.black,
+                        fontSize: 16,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    const Text(
+                      'Log your vitals, monitor medicines, and view reports.',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black54,
+                        fontSize: 13,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
               
               _buildVitalsCard(
                 title: 'Blood Pressure',
