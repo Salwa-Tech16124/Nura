@@ -140,12 +140,11 @@ class _VoiceStandbyScreenState extends State<VoiceStandbyScreen> {
                         ),
                       ),
   
-                      // Center Robot Assistant Avatar (matching Image 2)
+                      // Center Robot Assistant Avatar (matching new uploaded premium design)
                       Container(
-                        width: 125,
-                        height: 125,
+                        width: 130,
+                        height: 130,
                         decoration: BoxDecoration(
-                          color: Colors.white,
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.black, width: 2),
                           boxShadow: const [
@@ -156,92 +155,10 @@ class _VoiceStandbyScreenState extends State<VoiceStandbyScreen> {
                             ),
                           ],
                         ),
-                        child: Center(
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              // Ears (left/right)
-                              Positioned(
-                                left: 16,
-                                child: Container(
-                                  width: 8,
-                                  height: 20,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF00E5FF),
-                                    borderRadius: BorderRadius.circular(4),
-                                    border: Border.all(color: Colors.black, width: 1.5),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                right: 16,
-                                child: Container(
-                                  width: 8,
-                                  height: 20,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF00E5FF),
-                                    borderRadius: BorderRadius.circular(4),
-                                    border: Border.all(color: Colors.black, width: 1.5),
-                                  ),
-                                ),
-                              ),
-                              // Head shape
-                              Container(
-                                width: 76,
-                                height: 68,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(22),
-                                  border: Border.all(color: Colors.black, width: 2.2),
-                                ),
-                                child: Center(
-                                  child: Container(
-                                    width: 62,
-                                    height: 48,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF1E1E2C),
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        // Left Eye
-                                        Container(
-                                          width: 11,
-                                          height: 11,
-                                          decoration: const BoxDecoration(
-                                            color: Color(0xFF00E5FF),
-                                            shape: BoxShape.circle,
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Color(0xFF00E5FF),
-                                                blurRadius: 6,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        const SizedBox(width: 12),
-                                        // Right Eye
-                                        Container(
-                                          width: 11,
-                                          height: 11,
-                                          decoration: const BoxDecoration(
-                                            color: Color(0xFF00E5FF),
-                                            shape: BoxShape.circle,
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Color(0xFF00E5FF),
-                                                blurRadius: 6,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
+                        child: ClipOval(
+                          child: Image.asset(
+                            'assets/images/branding/nura_standby_robot.jpg',
+                            fit: BoxFit.cover,
                           ),
                         ),
                       ),
