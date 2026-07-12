@@ -5,6 +5,11 @@ import '../../core/constants/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
 import '../../widgets/buttons.dart';
 import '../../features/auth/providers/auth_state_provider.dart';
+import '../../models/chat_message.dart';
+import '../../widgets/chat_bubble.dart';
+import '../../widgets/chat_input.dart';
+import '../../widgets/typing_indicator.dart';
+import '../../services/ai_service.dart';
 
 import 'dart:async';
 import 'dart:math' as math;
@@ -42,13 +47,75 @@ class VoiceWelcomeScreen extends ConsumerStatefulWidget {
 
 class _VoiceWelcomeScreenState extends ConsumerState<VoiceWelcomeScreen> {
   final ValueNotifier<RobotTrigger?> _robotTriggerNotifier = ValueNotifier<RobotTrigger?>(null);
+  final List<ChatMessage> _messages = [];
+  bool _isLoading = false;
+  final TextEditingController _textController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+  String? _robotBubbleText;
 
   void _onSuggestionTap(String suggestion) {
     _robotTriggerNotifier.value = RobotTrigger.pointToSuggestions;
-    // Delayed navigation to show the microinteraction of the robot pointing/looking at the suggestion
-    Future.delayed(const Duration(milliseconds: 900), () {
+    _sendMessage(suggestion);
+  }
+
+  void _sendMessage(String text) async {
+    if (text.trim().isEmpty) return;
+
+    final userMsg = ChatMessage(
+      id: DateTime.now().toString(),
+      text: text,
+      sender: MessageSender.user,
+      timestamp: DateTime.now(),
+    );
+
+    setState(() {
+      _messages.add(userMsg);
+      _isLoading = true;
+      _robotBubbleText = "Let me think...";
+    });
+
+    _scrollToBottom();
+
+    try {
+      final reply = await ref.read(aiServiceProvider).chat(text);
       if (mounted) {
-        context.push('/voice-standby');
+        setState(() {
+          _messages.add(ChatMessage(
+            id: DateTime.now().toString(),
+            text: reply,
+            sender: MessageSender.ai,
+            timestamp: DateTime.now(),
+          ));
+          _isLoading = false;
+          _robotBubbleText = reply.length > 40 ? "${reply.substring(0, 40)}..." : reply;
+        });
+        _scrollToBottom();
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _messages.add(ChatMessage(
+            id: DateTime.now().toString(),
+            text: "Sorry, I had trouble connecting. Please try again.",
+            sender: MessageSender.ai,
+            timestamp: DateTime.now(),
+          ));
+          _isLoading = false;
+          _robotBubbleText = "Oh no! 🔌";
+        });
+        _scrollToBottom();
+      }
+    }
+  }
+
+  void _scrollToBottom() {
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
       }
     });
   }
@@ -66,6 +133,8 @@ class _VoiceWelcomeScreenState extends ConsumerState<VoiceWelcomeScreen> {
   @override
   void dispose() {
     _robotTriggerNotifier.dispose();
+    _textController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -148,89 +217,117 @@ class _VoiceWelcomeScreenState extends ConsumerState<VoiceWelcomeScreen> {
                     SizedBox(
                       width: 140,
                       height: 180,
-                      child: AnimatedRobot(triggerNotifier: _robotTriggerNotifier),
+                      child: AnimatedRobot(
+                        triggerNotifier: _robotTriggerNotifier,
+                        bubbleText: _robotBubbleText,
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.sm),
-                Text(
-                  "I understand your medicines, reports, symptoms and health history. How can I help you today?",
-                  style: TextStyle(
-                    color: isDark ? Colors.white70 : Colors.black87,
-                    fontSize: 14,
-                    height: 1.4,
-                    fontWeight: FontWeight.w500,
+                if (_messages.isEmpty) ...[
+                  Text(
+                    "I understand your medicines, reports, symptoms and health history. How can I help you today?",
+                    style: TextStyle(
+                      color: isDark ? Colors.white70 : Colors.black87,
+                      fontSize: 14,
+                      height: 1.4,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
-                
-                const SizedBox(height: AppSpacing.md),
-                
-                // Suggestions Section
-                Text(
-                  'Quick Suggestions',
-                  style: TextStyle(
-                    color: isDark ? Colors.white : Colors.black87,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
+                  const SizedBox(height: AppSpacing.md),
+                  
+                  // Suggestions Section
+                  Text(
+                    'Quick Suggestions',
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black87,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
                   ),
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                Expanded(
-                  child: ListView(
-                    physics: const BouncingScrollPhysics(),
+                  const SizedBox(height: AppSpacing.sm),
+                  Expanded(
+                    child: ListView(
+                      physics: const BouncingScrollPhysics(),
+                      children: [
+                        _buildSuggestionCard(
+                          context,
+                          icon: Icons.medication_outlined,
+                          color: const Color(0xFFC2F3F8), // Cyan
+                          title: 'Explain my medicines',
+                          onTap: () => _onSuggestionTap('Explain my medicines'),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        _buildSuggestionCard(
+                          context,
+                          icon: Icons.description_outlined,
+                          color: const Color(0xFFFED782), // Yellow
+                          title: 'Summarize my latest report',
+                          onTap: () => _onSuggestionTap('Summarize my latest report'),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        _buildSuggestionCard(
+                          context,
+                          icon: Icons.trending_up_outlined,
+                          color: const Color(0xFFC3F3C0), // Green
+                          title: 'Show my health timeline',
+                          onTap: () => _onSuggestionTap('Show my health timeline'),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        _buildSuggestionCard(
+                          context,
+                          icon: Icons.science_outlined,
+                          color: const Color(0xFFE5D5FF), // Lilac
+                          title: 'Explain my latest prescription',
+                          onTap: () => _onSuggestionTap('Explain my latest prescription'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  // Bottom Buttons
+                  Column(
                     children: [
-                      _buildSuggestionCard(
-                        context,
-                        icon: Icons.medication_outlined,
-                        color: const Color(0xFFC2F3F8), // Cyan
-                        title: 'Explain my medicines',
-                        onTap: () => _onSuggestionTap('Explain my medicines'),
+                      const SizedBox(height: AppSpacing.sm),
+                      PrimaryButton(
+                        text: '🎤 Start Voice Conversation',
+                        onPressed: _onStartVoiceTap,
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      OutlinedButtonWidget(
+                        text: 'Skip',
+                        color: isDark ? Colors.white : Colors.black,
+                        onPressed: () => context.pop(),
                       ),
                       const SizedBox(height: AppSpacing.md),
-                      _buildSuggestionCard(
-                        context,
-                        icon: Icons.description_outlined,
-                        color: const Color(0xFFFED782), // Yellow
-                        title: 'Summarize my latest report',
-                        onTap: () => _onSuggestionTap('Summarize my latest report'),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      _buildSuggestionCard(
-                        context,
-                        icon: Icons.trending_up_outlined,
-                        color: const Color(0xFFC3F3C0), // Green
-                        title: 'Show my health timeline',
-                        onTap: () => _onSuggestionTap('Show my health timeline'),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      _buildSuggestionCard(
-                        context,
-                        icon: Icons.science_outlined,
-                        color: const Color(0xFFE5D5FF), // Lilac
-                        title: 'Explain my latest prescription',
-                        onTap: () => _onSuggestionTap('Explain my latest prescription'),
-                      ),
                     ],
                   ),
-                ),
-                
-                // Bottom Buttons
-                Column(
-                  children: [
-                    const SizedBox(height: AppSpacing.sm),
-                    PrimaryButton(
-                      text: '🎤 Start Voice Conversation',
-                      onPressed: _onStartVoiceTap,
+                ] else ...[
+                  Expanded(
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: _messages.length + (_isLoading ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index == _messages.length) {
+                          return const TypingIndicator();
+                        }
+                        return ChatBubble(message: _messages[index]);
+                      },
                     ),
-                    const SizedBox(height: AppSpacing.sm),
-                    OutlinedButtonWidget(
-                      text: 'Skip',
-                      color: isDark ? Colors.white : Colors.black,
-                      onPressed: () => context.pop(),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                  ],
-                ),
+                  ),
+                  ChatInput(
+                    controller: _textController,
+                    onSend: () {
+                      final text = _textController.text;
+                      _textController.clear();
+                      _sendMessage(text);
+                    },
+                    onVoice: _onStartVoiceTap,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                ],
               ],
             ),
           ),
@@ -338,10 +435,12 @@ class SpeechBubblePainter extends CustomPainter {
 // ------------------------------------------------------------
 class AnimatedRobot extends ConsumerStatefulWidget {
   final ValueNotifier<RobotTrigger?> triggerNotifier;
+  final String? bubbleText;
 
   const AnimatedRobot({
     super.key,
     required this.triggerNotifier,
+    this.bubbleText,
   });
 
   @override
@@ -625,6 +724,7 @@ class _AnimatedRobotState extends ConsumerState<AnimatedRobot> with TickerProvid
   }
 
   void _startSpeechRotation() {
+    if (widget.bubbleText != null) return;
     _rotationTimer?.cancel();
     _rotationTimer = Timer.periodic(const Duration(milliseconds: 5500), (timer) {
       if (!mounted || _currentState == RobotState.actionTransition || _isBusy) return;
@@ -1060,10 +1160,18 @@ class _AnimatedRobotState extends ConsumerState<AnimatedRobot> with TickerProvid
   @override
   void didUpdateWidget(covariant AnimatedRobot oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Listen to parent text changes to synchronize mouth/gestures
-    // This is driven by rotating idleMessages in the welcome screen.
-    // To sync text changes from rotation timer to behavior:
-    _onMessageChanged(_bubbleText);
+    if (widget.bubbleText != null && widget.bubbleText != oldWidget.bubbleText) {
+      _rotationTimer?.cancel();
+      setState(() {
+        _bubbleText = widget.bubbleText!;
+      });
+      _onMessageChanged(_bubbleText);
+    } else if (widget.bubbleText == null) {
+      // Listen to parent text changes to synchronize mouth/gestures
+      // This is driven by rotating idleMessages in the welcome screen.
+      // To sync text changes from rotation timer to behavior:
+      _onMessageChanged(_bubbleText);
+    }
   }
 }
 

@@ -15,12 +15,70 @@ import 'widgets/health_risk_card.dart';
 import 'widgets/goal_progress_card.dart';
 import '../../widgets/navigation.dart';
 import '../../features/auth/providers/auth_state_provider.dart';
+import '../../services/ai_service.dart';
 
-class AIHealthSummaryScreen extends ConsumerWidget {
+class AIHealthSummaryScreen extends ConsumerStatefulWidget {
   const AIHealthSummaryScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AIHealthSummaryScreen> createState() => _AIHealthSummaryScreenState();
+}
+
+class _AIHealthSummaryScreenState extends ConsumerState<AIHealthSummaryScreen> {
+  String? _summary;
+  List<String>? _risks;
+  bool _isLoadingSummary = true;
+  bool _isLoadingRisks = true;
+  String? _summaryError;
+  String? _risksError;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchSummary();
+    _fetchRisks();
+  }
+
+  Future<void> _fetchSummary() async {
+    try {
+      final summary = await ref.read(aiServiceProvider).getSummary();
+      if (mounted) {
+        setState(() {
+          _summary = summary;
+          _isLoadingSummary = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _summaryError = 'Failed to load health summary.';
+          _isLoadingSummary = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _fetchRisks() async {
+    try {
+      final risks = await ref.read(aiServiceProvider).getRiskAnalysis();
+      if (mounted) {
+        setState(() {
+          _risks = risks;
+          _isLoadingRisks = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _risksError = 'Failed to load risk analysis.';
+          _isLoadingRisks = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0A0C16) : AppColors.background,
@@ -58,10 +116,31 @@ class AIHealthSummaryScreen extends ConsumerWidget {
 
             // Section 2: AI Summary Card
             const SectionHeader(title: 'AI Summary Card'),
-            InformationCard(
-              title: 'Hello ${ref.watch(authStateProvider).user?.name.split(' ').first ?? 'John'},',
-              description: 'Based on your recent health records, your overall health is improving.\n\nYour medicine adherence has remained excellent.\n\nYour blood pressure and blood sugar levels have stayed within a healthy range.\n\nYour daily walking activity has increased compared to last month.\n\nKeep following your current routine.',
-            ),
+            if (_isLoadingSummary)
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(AppSpacing.md),
+                  child: CircularProgressIndicator(color: Colors.black),
+                ),
+              )
+            else if (_summaryError != null)
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFCDD2),
+                  border: Border.all(color: Colors.red, width: 1.8),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  _summaryError!,
+                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+                ),
+              )
+            else
+              InformationCard(
+                title: 'Hello ${ref.watch(authStateProvider).user?.name.split(' ').first ?? 'John'},',
+                description: _summary ?? 'No summary generated.',
+              ),
             const SizedBox(height: AppSpacing.xl),
 
             // Section 3: AI Observations
@@ -79,11 +158,41 @@ class AIHealthSummaryScreen extends ConsumerWidget {
 
             // Section 4: Health Risks
             const SectionHeader(title: 'Health Risks'),
-            const HealthRiskCard(title: 'Low Water Intake'),
-            const SizedBox(height: AppSpacing.sm),
-            const HealthRiskCard(title: 'Moderate Sleep Quality'),
-            const SizedBox(height: AppSpacing.sm),
-            const HealthRiskCard(title: 'Occasional Missed Medicines'),
+            if (_isLoadingRisks)
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(AppSpacing.md),
+                  child: CircularProgressIndicator(color: Colors.black),
+                ),
+              )
+            else if (_risksError != null)
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFCDD2),
+                  border: Border.all(color: Colors.red, width: 1.8),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  _risksError!,
+                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+                ),
+              )
+            else if (_risks == null || _risks!.isEmpty)
+              const Padding(
+                padding: EdgeInsets.all(AppSpacing.sm),
+                child: Text(
+                  'No significant risks detected.',
+                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white70),
+                ),
+              )
+            else
+              ..._risks!.map((risk) => Column(
+                    children: [
+                      HealthRiskCard(title: risk),
+                      const SizedBox(height: AppSpacing.sm),
+                    ],
+                  )),
             const SizedBox(height: AppSpacing.xl),
 
             // Section 5: Personalized Recommendations
