@@ -336,7 +336,7 @@ class SpeechBubblePainter extends CustomPainter {
 // ------------------------------------------------------------
 // ANIMATED ROBOT WITH COMPREHENSIVE ACTIONS (Natural behavior loop)
 // ------------------------------------------------------------
-class AnimatedRobot extends StatefulWidget {
+class AnimatedRobot extends ConsumerStatefulWidget {
   final ValueNotifier<RobotTrigger?> triggerNotifier;
 
   const AnimatedRobot({
@@ -345,10 +345,10 @@ class AnimatedRobot extends StatefulWidget {
   });
 
   @override
-  State<AnimatedRobot> createState() => _AnimatedRobotState();
+  ConsumerState<AnimatedRobot> createState() => _AnimatedRobotState();
 }
 
-class _AnimatedRobotState extends State<AnimatedRobot> with TickerProviderStateMixin {
+class _AnimatedRobotState extends ConsumerState<AnimatedRobot> with TickerProviderStateMixin {
   // Animation controllers for premium 3D movement and core glow
   late final AnimationController _hoverController;
   late final AnimationController _pulseController;

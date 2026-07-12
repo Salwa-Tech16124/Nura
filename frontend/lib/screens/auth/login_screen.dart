@@ -26,7 +26,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
-  Future<void> _handleLogin(BuildContext context) async {
+  Future<void> _handleLogin() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
@@ -377,7 +377,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
                         ),
                       ),
-                      onPressed: isLoading ? null : () => _handleLogin(context),
+                      onPressed: isLoading ? null : _handleLogin,
                       child: isLoading
                           ? const SizedBox(
                               height: 20,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/constants/app_spacing.dart';
 import '../../core/services/audio_service.dart';
@@ -39,6 +38,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
         final authNotifier = ref.read(authStateProvider.notifier);
         
         final hasToken = await secureStorage.hasToken();
+        if (!mounted) return;
         if (hasToken) {
           final isValid = await authNotifier.checkAuthStatus();
           if (mounted) {

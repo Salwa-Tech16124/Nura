@@ -7,7 +7,6 @@ import '../../widgets/layout/page_container.dart';
 import '../../features/auth/providers/auth_state_provider.dart';
 import '../../features/auth/providers/auth_state.dart';
 import '../../features/auth/models/register_request.dart';
-import 'login_screen.dart'; // To use DarkTextField and LoginWavePainter
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -33,7 +32,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     super.dispose();
   }
 
-  Future<void> _handleRegister(BuildContext context) async {
+  Future<void> _handleRegister() async {
     final name = _nameController.text.trim();
     final email = _emailController.text.trim();
     final phone = _phoneController.text.trim();
@@ -301,7 +300,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
                         ),
                       ),
-                      onPressed: isLoading ? null : () => _handleRegister(context),
+                      onPressed: isLoading ? null : _handleRegister,
                       child: isLoading
                           ? const SizedBox(
                               height: 20,

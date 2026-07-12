@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'core/theme/app_colors.dart';
-import 'core/theme/app_typography.dart';
 import 'core/theme/app_theme.dart';
 import 'core/routes/app_routes.dart';
 import 'core/providers/theme_provider.dart';
+import 'features/auth/providers/auth_state_provider.dart';
+import 'features/auth/providers/auth_state.dart';
 
 void main() {
   runApp(
@@ -20,6 +20,17 @@ class NuraApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
+
+    // Listen for auth state changes (e.g. session expiration or logout) to redirect to login
+    ref.listen<AuthState>(authStateProvider, (previous, next) {
+      if (next.status == AuthStatus.unauthenticated) {
+        final router = AppRouter.router;
+        final location = router.routerDelegate.currentConfiguration.uri.path;
+        if (location != '/login' && location != '/register' && location != '/onboarding' && location != '/splash') {
+          router.go('/login');
+        }
+      }
+    });
 
     return MaterialApp.router(
       title: 'NURA',

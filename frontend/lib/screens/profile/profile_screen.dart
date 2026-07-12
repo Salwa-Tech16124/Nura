@@ -31,6 +31,7 @@ class ProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
     final isDark = themeMode == ThemeMode.dark;
+    final user = ref.watch(authStateProvider).user;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0A0C16) : const Color(0xFFE8F1F5), // Dynamic neobrutalist backdrop
@@ -118,11 +119,11 @@ class ProfileScreen extends ConsumerWidget {
 
             // Section 1: Profile Card (Vibrant Cyan)
             ProfileHeaderCard(
-              name: ref.watch(authStateProvider).user?.name ?? 'Sarah Jenkins',
-              age: ref.watch(authStateProvider).user?.age != null
-                  ? '${ref.watch(authStateProvider).user!.age} Years'
+              name: user?.name ?? 'Sarah Jenkins',
+              age: user?.age != null
+                  ? '${user!.age} Years'
                   : '34 Years',
-              gender: ref.watch(authStateProvider).user?.gender ?? 'Female',
+              gender: user?.gender ?? 'Female',
               bloodGroup: 'O+',
               onEdit: () => context.push('/health-profile'),
             ),
@@ -130,11 +131,11 @@ class ProfileScreen extends ConsumerWidget {
 
             // Section 2: Personal Information (Lilac background)
             _buildSectionHeader('Personal Information', isDark: isDark),
-            const PersonalInfoCard(
-              backgroundColor: Color(0xFFE5D5FF), // Lilac
+            PersonalInfoCard(
+              backgroundColor: const Color(0xFFE5D5FF), // Lilac
               infoData: {
-                'Phone Number': '+1 234 567 8900',
-                'Email': 'sarah.jenkins@example.com',
+                'Phone Number': user?.phoneNumber ?? '+1 234 567 8900',
+                'Email': user?.email ?? 'sarah.jenkins@example.com',
                 'Date of Birth': '12 May 1992',
                 'Height': '168 cm',
                 'Weight': '62 kg',
@@ -159,32 +160,35 @@ class ProfileScreen extends ConsumerWidget {
             // Section 4: Emergency Contacts (Vibrant Green background)
             _buildSectionHeader('Emergency Contacts', isDark: isDark),
             ContactProfileCard(
-              name: 'Sarah Doe',
-              relationship: 'Daughter',
-              phoneNumber: '+1 987 654 3210',
+              name: user?.emergencyContact != null ? 'Primary Emergency' : 'Sarah Doe',
+              relationship: user?.emergencyContact != null ? 'Contact' : 'Daughter',
+              phoneNumber: user?.emergencyContact ?? '+1 987 654 3210',
               onCall: () {
+                final phone = user?.emergencyContact ?? '+1 987 654 3210';
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Calling Sarah Doe (+1 987 654 3210)...'),
-                    duration: Duration(seconds: 2),
+                  SnackBar(
+                    content: Text('Calling $phone...'),
+                    duration: const Duration(seconds: 2),
                   ),
                 );
               },
             ),
-            const SizedBox(height: AppSpacing.md),
-            ContactProfileCard(
-              name: 'Mike Doe',
-              relationship: 'Son',
-              phoneNumber: '+1 555 123 4567',
-              onCall: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Calling Mike Doe (+1 555 123 4567)...'),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-              },
-            ),
+            if (user?.emergencyContact == null) ...[
+              const SizedBox(height: AppSpacing.md),
+              ContactProfileCard(
+                name: 'Mike Doe',
+                relationship: 'Son',
+                phoneNumber: '+1 555 123 4567',
+                onCall: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Calling Mike Doe (+1 555 123 4567)...'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                },
+              ),
+            ],
             const SizedBox(height: AppSpacing.xl),
 
             // Section 5: Quick Actions (White with outlined pastel icon dots)
@@ -303,7 +307,12 @@ class ProfileScreen extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(28),
                   ),
                 ),
-                onPressed: () => context.go('/login'),
+                onPressed: () async {
+                  await ref.read(authStateProvider.notifier).logout();
+                  if (context.mounted) {
+                    context.go('/login');
+                  }
+                },
                 child: const Text(
                   'Logout',
                   style: TextStyle(
