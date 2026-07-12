@@ -4,8 +4,115 @@ import '../../core/theme/app_typography.dart';
 import '../../core/constants/app_spacing.dart';
 import '../../widgets/layout/page_container.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  bool _rememberMe = false;
+
+  void _showForgotPasswordDialog(BuildContext context) {
+    final emailController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1E244A),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: Color(0xFFEC407A), width: 1.8),
+        ),
+        title: const Row(
+          children: [
+            Icon(Icons.lock_reset_outlined, color: Color(0xFFEC407A), size: 28),
+            SizedBox(width: 10),
+            Text(
+              'Reset Password',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w900,
+                fontSize: 20,
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'Enter your registered email address to receive a secure password reset link.',
+              style: TextStyle(
+                color: Colors.white70,
+                fontWeight: FontWeight.w500,
+                fontSize: 13,
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: emailController,
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                hintText: 'Email Address',
+                hintStyle: const TextStyle(color: Colors.white38),
+                filled: true,
+                fillColor: Colors.white.withAlpha(10),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Colors.white24),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFFEC407A)),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(
+                color: Colors.white54,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFEC407A),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Password reset email sent to ${emailController.text}!',
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                  backgroundColor: const Color(0xFF2E7D32),
+                ),
+              );
+            },
+            child: const Text(
+              'Send Link',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,15 +207,12 @@ class LoginScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
-                    'welcome back we missed you',
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: Colors.white.withAlpha(150),
-                      fontSize: 15,
-                    ),
+                    'Your healthcare copilot is ready to assist you.',
+                    style: AppTypography.bodyMedium.copyWith(color: Colors.white70),
                   ),
-                  const SizedBox(height: AppSpacing.xxl),
+                  const SizedBox(height: AppSpacing.xl),
 
-                  // Inputs
+                  // Email and password form inputs
                   const DarkTextField(
                     hintText: 'Email Address',
                     prefixIcon: Icons.email_outlined,
@@ -132,8 +236,12 @@ class LoginScreen extends StatelessWidget {
                               unselectedWidgetColor: Colors.white54,
                             ),
                             child: Checkbox(
-                              value: false,
-                              onChanged: (v) {},
+                              value: _rememberMe,
+                              onChanged: (v) {
+                                setState(() {
+                                  _rememberMe = v ?? false;
+                                });
+                              },
                               activeColor: const Color(0xFFEC407A),
                               side: const BorderSide(color: Colors.white38, width: 1.5),
                             ),
@@ -145,7 +253,9 @@ class LoginScreen extends StatelessWidget {
                         ],
                       ),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          _showForgotPasswordDialog(context);
+                        },
                         child: Text(
                           'Forgot Password?',
                           style: AppTypography.bodyMedium.copyWith(
@@ -195,7 +305,6 @@ class LoginScreen extends StatelessWidget {
                           color: Colors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
                         ),
                       ),
                     ),

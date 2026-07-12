@@ -110,7 +110,55 @@ class HealthProfileScreen extends StatelessWidget {
             const SizedBox(height: AppSpacing.xl),
 
             // Bottom Actions
-            PrimaryButton(text: 'Update Health Profile', onPressed: () {}),
+            PrimaryButton(
+              text: 'Update Health Profile',
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: const BorderSide(color: Colors.black, width: 2),
+                    ),
+                    title: const Row(
+                      children: [
+                        Icon(Icons.check_circle_outline, color: Color(0xFF2E7D32), size: 28),
+                        SizedBox(width: 10),
+                        Text(
+                          'Success',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 20,
+                          ),
+                        ),
+                      ],
+                    ),
+                    content: const Text(
+                      'Your health profile has been updated successfully! NURA AI has updated its context.',
+                      style: TextStyle(
+                        color: Colors.black87,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text(
+                          'OK',
+                          style: TextStyle(
+                            color: Color(0xFF0056D2),
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
             const SizedBox(height: AppSpacing.md),
             SecondaryButton(text: 'Back to Profile', onPressed: () => context.pop()),
             
