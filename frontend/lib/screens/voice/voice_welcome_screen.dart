@@ -1144,8 +1144,26 @@ class PremiumRobotPainter extends CustomPainter {
     final torsoRect = Rect.fromCenter(center: bodyCenter, width: 36, height: 34);
     _drawShadedTorso(canvas, torsoRect);
 
-    // Cyber Heart Glowing Chest Logo
-    _drawGlowingChestCore(canvas, bodyCenter - const Offset(0, 1), pulseValue);
+    // Red Cross Chest Badge (Matching the new uploaded medical robot)
+    final badgeCenter = bodyCenter + const Offset(0, 2);
+    
+    // Glowing red aura behind cross
+    final crossGlow = Paint()
+      ..color = const Color(0xFFD50000).withValues(alpha: 0.15 * pulseValue + 0.1)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5);
+    canvas.drawCircle(badgeCenter, 11, crossGlow);
+
+    final badgePaint = Paint()..color = const Color(0xFFD50000); // Red Cross Red
+    canvas.drawCircle(badgeCenter, 8.0, badgePaint);
+
+    final crossPaint = Paint()
+      ..color = Colors.white
+      ..strokeWidth = 2.4
+      ..strokeCap = StrokeCap.square;
+    // Horizontal bar
+    canvas.drawLine(badgeCenter - const Offset(4.5, 0), badgeCenter + const Offset(4.5, 0), crossPaint);
+    // Vertical bar
+    canvas.drawLine(badgeCenter - const Offset(0, 4.5), badgeCenter + const Offset(0, 4.5), crossPaint);
     canvas.restore();
 
     // 4. Draw Neck Link (Metallic Chrome rod)
@@ -1159,15 +1177,60 @@ class PremiumRobotPainter extends CustomPainter {
     canvas.rotate(headTilt);
     canvas.translate(-headCenter.dx, -headCenter.dy);
 
-    // Side Ambient Blue ear indicators
-    final leftEarCenter = headCenter - const Offset(23, 0);
-    final rightEarCenter = headCenter + const Offset(23, 0);
-    _drawAmbientEarIndicator(canvas, leftEarCenter, left: true);
-    _drawAmbientEarIndicator(canvas, rightEarCenter, left: false);
+    // Red Pin Ear indicators (stick + red sphere) - Matching new uploaded medical robot
+    final leftEarStickStart = headCenter - const Offset(21, 0);
+    final leftEarStickEnd = headCenter - const Offset(24, 9);
+    final rightEarStickStart = headCenter + const Offset(21, 0);
+    final rightEarStickEnd = headCenter + const Offset(24, 9);
+
+    final stickPaint = Paint()
+      ..color = const Color(0xFF546E7A)
+      ..strokeWidth = 2.0;
+    canvas.drawLine(leftEarStickStart, leftEarStickEnd, stickPaint);
+    canvas.drawLine(rightEarStickStart, rightEarStickEnd, stickPaint);
+
+    final ballPaint = Paint()
+      ..shader = RadialGradient(
+        colors: [
+          Colors.white,
+          Colors.redAccent,
+          const Color(0xFFD50000),
+        ],
+        center: const Alignment(-0.25, -0.25),
+      ).createShader(Rect.fromCircle(center: leftEarStickEnd, radius: 4));
+
+    canvas.drawCircle(leftEarStickEnd, 4, ballPaint);
+    canvas.drawCircle(rightEarStickEnd, 4, ballPaint);
 
     // Glossy White rounded Head shell
     final headRect = Rect.fromCenter(center: headCenter, width: 44, height: 36);
     _drawShadedHead(canvas, headRect);
+
+    // Red Emergency Siren on top of Head shell (Matching the new uploaded medical robot)
+    final sirenRect = Rect.fromCenter(center: headCenter - const Offset(0, 19), width: 12, height: 9);
+    final sirenRRect = RRect.fromRectAndRadius(sirenRect, const Radius.circular(3));
+    final sirenPaint = Paint()
+      ..shader = RadialGradient(
+        colors: [
+          Colors.white,
+          Colors.redAccent,
+          const Color(0xFFD50000), // Crimson red
+        ],
+        center: const Alignment(-0.2, -0.2),
+      ).createShader(sirenRect);
+    canvas.drawRRect(sirenRRect, sirenPaint);
+
+    // Draw siren metallic base connection
+    final sirenBase = Paint()
+      ..color = const Color(0xFF546E7A)
+      ..style = PaintingStyle.fill;
+    canvas.drawRect(Rect.fromCenter(center: headCenter - const Offset(0, 15), width: 14, height: 2), sirenBase);
+
+    // Flashing siren beam glow
+    final sirenGlow = Paint()
+      ..color = Colors.redAccent.withValues(alpha: 0.35 * pulseValue)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
+    canvas.drawCircle(headCenter - const Offset(0, 19), 10, sirenGlow);
 
     // Dark black Glass plate display screen
     final faceRect = Rect.fromCenter(center: headCenter - const Offset(0, 1), width: 34, height: 25);
@@ -1190,6 +1253,39 @@ class PremiumRobotPainter extends CustomPainter {
     final leftArmEnd = leftShoulder + const Offset(-15, 10);
     _drawShadedCapsule(canvas, leftShoulder, leftArmEnd, 7.5);
     _drawShadedHand(canvas, leftArmEnd);
+
+    // Red First Aid Medical Case hanging from Left Hand (Matching new uploaded medical robot)
+    final boxCenter = leftArmEnd + const Offset(-4, 12);
+    final boxRect = Rect.fromCenter(center: boxCenter, width: 22, height: 16);
+    final boxRRect = RRect.fromRectAndRadius(boxRect, const Radius.circular(4));
+    final boxPaint = Paint()
+      ..shader = RadialGradient(
+        colors: [
+          Colors.redAccent,
+          const Color(0xFFD50000),
+        ],
+        center: const Alignment(-0.2, -0.2),
+      ).createShader(boxRect);
+    canvas.drawRRect(boxRRect, boxPaint);
+
+    // Draw handle on top of case
+    final handlePaint = Paint()
+      ..color = const Color(0xFF37474F)
+      ..strokeWidth = 2.0
+      ..style = PaintingStyle.stroke;
+    final handlePath = Path()
+      ..moveTo(boxCenter.dx - 5, boxCenter.dy - 8)
+      ..quadraticBezierTo(boxCenter.dx, boxCenter.dy - 12, boxCenter.dx + 5, boxCenter.dy - 8);
+    canvas.drawPath(handlePath, handlePaint);
+
+    // Draw white cross on the case
+    final boxCrossPaint = Paint()
+      ..color = Colors.white
+      ..strokeWidth = 2.0;
+    // Horizontal bar
+    canvas.drawLine(boxCenter - const Offset(4, 0), boxCenter + const Offset(4, 0), boxCrossPaint);
+    // Vertical bar
+    canvas.drawLine(boxCenter - const Offset(0, 4), boxCenter + const Offset(0, 4), boxCrossPaint);
     canvas.restore();
 
     // 7. Draw Right Arm (points, waves, folds, or rests)
@@ -1319,19 +1415,7 @@ class PremiumRobotPainter extends CustomPainter {
     canvas.drawRRect(rrect, paint);
   }
 
-  void _drawAmbientEarIndicator(Canvas canvas, Offset center, {required bool left}) {
-    final rect = Rect.fromCircle(center: center, radius: 4.5);
-    final paint = Paint()
-      ..shader = RadialGradient(
-        colors: [
-          const Color(0xFF00E5FF),
-          const Color(0xFF0288D1).withValues(alpha: 0.8),
-          const Color(0xFF1E244A),
-        ],
-        stops: const [0.2, 0.7, 1.0],
-      ).createShader(rect);
-    canvas.drawCircle(center, 4.5, paint);
-  }
+
 
   void _drawGlassFaceplate(Canvas canvas, Rect rect) {
     final rrect = RRect.fromRectAndRadius(rect, Radius.circular(rect.height * 0.35));
@@ -1378,39 +1462,7 @@ class PremiumRobotPainter extends CustomPainter {
     canvas.drawRRect(rrect, highlightPaint);
   }
 
-  void _drawGlowingChestCore(Canvas canvas, Offset center, double pulse) {
-    final double radius = 6.0;
-    final double outerGlow = radius + (pulse * 8.0);
 
-    // Aura pulse glow
-    final glowPaint = Paint()
-      ..shader = RadialGradient(
-        colors: [
-          const Color(0xFF00E5FF).withValues(alpha: 0.5 * (1.0 - pulse * 0.35)),
-          const Color(0xFF00E5FF).withValues(alpha: 0.0),
-        ],
-      ).createShader(Rect.fromCircle(center: center, radius: outerGlow));
-    canvas.drawCircle(center, outerGlow, glowPaint);
-
-    // Core Solid White-blue center
-    final corePaint = Paint()
-      ..color = const Color(0xFFE0F7FA)
-      ..style = PaintingStyle.fill;
-    canvas.drawCircle(center, radius, corePaint);
-
-    // Small cyber heart logo inside core
-    final path = Path();
-    final d = 3.5;
-    path.moveTo(center.dx, center.dy + d);
-    path.cubicTo(center.dx - d, center.dy + d/2, center.dx - d, center.dy - d/2, center.dx, center.dy - d/2);
-    path.cubicTo(center.dx + d, center.dy - d/2, center.dx + d, center.dy + d/2, center.dx, center.dy + d);
-    path.close();
-
-    final logoPaint = Paint()
-      ..color = const Color(0xFF00E5FF)
-      ..style = PaintingStyle.fill;
-    canvas.drawPath(path, logoPaint);
-  }
 
   void _drawGlowingEyes(Canvas canvas, Offset headCenter) {
     final eyePaint = Paint()
