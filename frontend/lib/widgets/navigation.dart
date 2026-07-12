@@ -13,12 +13,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iconColor = isDark ? Colors.white : AppColors.textPrimary;
+    final titleColor = isDark ? Colors.white : AppColors.textPrimary;
+
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
       centerTitle: true,
       leading: showBackButton ? IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.textPrimary),
+        icon: Icon(Icons.arrow_back_ios_new, color: iconColor),
         onPressed: () => Navigator.maybePop(context),
       ) : null,
       title: Row(
@@ -28,7 +32,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             Image.asset('assets/images/branding/nura_app_icon.png', height: 28),
             const SizedBox(width: AppSpacing.sm),
           ],
-          Text(title, style: AppTypography.h2),
+          Text(title, style: AppTypography.h2.copyWith(color: titleColor)),
         ],
       ),
       actions: actions,
@@ -74,12 +78,15 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : AppColors.textPrimary;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: AppTypography.h3),
+          Text(title, style: AppTypography.h3.copyWith(color: textColor)),
           if (actionText != null)
             GestureDetector(
               onTap: onActionTap,

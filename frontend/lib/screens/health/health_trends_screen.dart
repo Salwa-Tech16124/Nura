@@ -8,19 +8,20 @@ import '../../widgets/navigation.dart';
 class HealthTrendsScreen extends StatelessWidget {
   const HealthTrendsScreen({super.key});
 
-  Widget _buildDummyChart(String title, Color color, List<String> yLabels) {
+  Widget _buildDummyChart(BuildContext context, String title, Color color, List<String> yLabels) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: isDark ? const Color(0xFF121625) : AppColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-        border: Border.all(color: AppColors.border.withOpacity(0.5)),
+        border: Border.all(color: isDark ? Colors.white24 : AppColors.border.withOpacity(0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold)),
+          Text(title, style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold, color: isDark ? Colors.white : null)),
           const SizedBox(height: AppSpacing.lg),
           // Dummy chart representation
           SizedBox(
@@ -30,7 +31,7 @@ class HealthTrendsScreen extends StatelessWidget {
                 // Y-axis
                 Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: yLabels.map((l) => Text(l, style: AppTypography.bodySmall.copyWith(fontSize: 10))).toList(),
+                  children: yLabels.map((l) => Text(l, style: AppTypography.bodySmall.copyWith(fontSize: 10, color: isDark ? Colors.white54 : null))).toList(),
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 // Graph Area
@@ -40,7 +41,7 @@ class HealthTrendsScreen extends StatelessWidget {
                       // Grid lines
                       Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: List.generate(yLabels.length, (index) => Container(height: 1, color: AppColors.border.withOpacity(0.5))),
+                        children: List.generate(yLabels.length, (index) => Container(height: 1, color: isDark ? Colors.white12 : AppColors.border.withOpacity(0.5))),
                       ),
                       // Fake line chart placeholder
                       Positioned.fill(
@@ -56,11 +57,11 @@ class HealthTrendsScreen extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
-                            color: AppColors.surface,
-                            border: Border.all(color: AppColors.border),
+                            color: isDark ? const Color(0xFF121625) : AppColors.surface,
+                            border: Border.all(color: isDark ? Colors.white24 : AppColors.border),
                             borderRadius: BorderRadius.circular(4),
                           ),
-                          child: Text('Weekly\naverages', style: AppTypography.bodySmall.copyWith(fontSize: 8), textAlign: TextAlign.center),
+                          child: Text('Weekly\naverages', style: AppTypography.bodySmall.copyWith(fontSize: 8, color: isDark ? Colors.white70 : null), textAlign: TextAlign.center),
                         ),
                       ),
                       // X-axis labels
@@ -70,12 +71,12 @@ class HealthTrendsScreen extends StatelessWidget {
                         right: 0,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: const [
-                            Text('Mon', style: TextStyle(fontSize: 10, color: AppColors.textSecondary)),
-                            Text('Wed', style: TextStyle(fontSize: 10, color: AppColors.textSecondary)),
-                            Text('Wed', style: TextStyle(fontSize: 10, color: AppColors.textSecondary)),
-                            Text('Wed', style: TextStyle(fontSize: 10, color: AppColors.textSecondary)),
-                            Text('Wed', style: TextStyle(fontSize: 10, color: AppColors.textSecondary)),
+                          children: [
+                            Text('Mon', style: TextStyle(fontSize: 10, color: isDark ? Colors.white54 : AppColors.textSecondary)),
+                            Text('Wed', style: TextStyle(fontSize: 10, color: isDark ? Colors.white54 : AppColors.textSecondary)),
+                            Text('Wed', style: TextStyle(fontSize: 10, color: isDark ? Colors.white54 : AppColors.textSecondary)),
+                            Text('Wed', style: TextStyle(fontSize: 10, color: isDark ? Colors.white54 : AppColors.textSecondary)),
+                            Text('Wed', style: TextStyle(fontSize: 10, color: isDark ? Colors.white54 : AppColors.textSecondary)),
                           ],
                         ),
                       ),
@@ -92,8 +93,9 @@ class HealthTrendsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: isDark ? const Color(0xFF0A0C16) : AppColors.background,
       appBar: CustomAppBar(
         title: 'Trends',
         showBackButton: true,
@@ -105,11 +107,13 @@ class HealthTrendsScreen extends StatelessWidget {
             children: [
               const SizedBox(height: AppSpacing.sm),
               _buildDummyChart(
+                context,
                 'BP Trend (Last 30 Days)', 
                 AppColors.primary,
                 ['140', '130', '120', '110', '100', '90', '80']
               ),
               _buildDummyChart(
+                context,
                 'Blood Sugar (Last 30 Days)', 
                 AppColors.secondary,
                 ['100', '80', '60', '40', '20', '0']

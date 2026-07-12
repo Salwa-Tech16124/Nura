@@ -11,7 +11,8 @@ import '../../core/constants/app_spacing.dart';
 class FamilyAlertScreen extends StatelessWidget {
   const FamilyAlertScreen({super.key});
 
-  Widget _buildContactCard(String name, String relationship, String phone) {
+  Widget _buildContactCard(BuildContext context, String name, String relationship, String phone) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return BaseCard(
       child: Row(
         children: [
@@ -24,10 +25,10 @@ class FamilyAlertScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name, style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold)),
-                Text(relationship, style: AppTypography.bodySmall),
+                Text(name, style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold, color: isDark ? Colors.white : null)),
+                Text(relationship, style: AppTypography.bodySmall.copyWith(color: isDark ? Colors.white70 : null)),
                 const SizedBox(height: 2),
-                Text(phone, style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary)),
+                Text(phone, style: AppTypography.bodySmall.copyWith(color: isDark ? Colors.white54 : AppColors.textSecondary)),
               ],
             ),
           ),
@@ -56,8 +57,9 @@ class FamilyAlertScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: isDark ? const Color(0xFF0A0C16) : AppColors.background,
       appBar: const CustomAppBar(title: 'Critical Medication Alert'),
       body: PageContainer(
         child: ScrollablePageLayout(
@@ -77,7 +79,7 @@ class FamilyAlertScreen extends StatelessWidget {
             // Alert Headline matching image
             Text(
               'CRITICAL ALERT:\nMultiple Doses Missed by Eleanor.',
-              style: AppTypography.h2.copyWith(fontWeight: FontWeight.bold),
+              style: AppTypography.h2.copyWith(fontWeight: FontWeight.bold, color: isDark ? Colors.white : null),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.xl),
@@ -90,39 +92,39 @@ class FamilyAlertScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Patient Name', style: AppTypography.bodyMedium),
-                      Text('Eleanor Rigby', style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold)),
+                      Text('Patient Name', style: AppTypography.bodyMedium.copyWith(color: isDark ? Colors.white70 : null)),
+                      Text('Eleanor Rigby', style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold, color: isDark ? Colors.white : null)),
                     ],
                   ),
-                  const Padding(padding: EdgeInsets.symmetric(vertical: AppSpacing.xs), child: Divider(color: AppColors.border)),
+                  Padding(padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs), child: Divider(color: isDark ? Colors.white24 : AppColors.border)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Medicine', style: AppTypography.bodyMedium),
-                      Text('Lisinopril 10 mg', style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold)),
+                      Text('Medicine', style: AppTypography.bodyMedium.copyWith(color: isDark ? Colors.white70 : null)),
+                      Text('Lisinopril 10 mg', style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold, color: isDark ? Colors.white : null)),
                     ],
                   ),
-                  const Padding(padding: EdgeInsets.symmetric(vertical: AppSpacing.xs), child: Divider(color: AppColors.border)),
+                  Padding(padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs), child: Divider(color: isDark ? Colors.white24 : AppColors.border)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Last Missed Time', style: AppTypography.bodyMedium),
-                      Text('Today, 8:00 AM', style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold)),
+                      Text('Last Missed Time', style: AppTypography.bodyMedium.copyWith(color: isDark ? Colors.white70 : null)),
+                      Text('Today, 8:00 AM', style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold, color: isDark ? Colors.white : null)),
                     ],
                   ),
-                  const Padding(padding: EdgeInsets.symmetric(vertical: AppSpacing.xs), child: Divider(color: AppColors.border)),
+                  Padding(padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs), child: Divider(color: isDark ? Colors.white24 : AppColors.border)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Missed Doses', style: AppTypography.bodyMedium),
+                      Text('Missed Doses', style: AppTypography.bodyMedium.copyWith(color: isDark ? Colors.white70 : null)),
                       Text('3 Consecutive', style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold, color: AppColors.error)),
                     ],
                   ),
-                  const Padding(padding: EdgeInsets.symmetric(vertical: AppSpacing.xs), child: Divider(color: AppColors.border)),
+                  Padding(padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs), child: Divider(color: isDark ? Colors.white24 : AppColors.border)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Risk Level', style: AppTypography.bodyMedium),
+                      Text('Risk Level', style: AppTypography.bodyMedium.copyWith(color: isDark ? Colors.white70 : null)),
                       Text('High', style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold, color: AppColors.error)),
                     ],
                   ),
@@ -133,11 +135,11 @@ class FamilyAlertScreen extends StatelessWidget {
 
             // Emergency Contacts
             const SectionHeader(title: 'Emergency Contacts'),
-            _buildContactCard('Sarah', 'Daughter', '+1 555-0101'),
+            _buildContactCard(context, 'Sarah', 'Daughter', '+1 555-0101'),
             const SizedBox(height: AppSpacing.sm),
-            _buildContactCard('Mike', 'Son', '+1 555-0102'),
+            _buildContactCard(context, 'Mike', 'Son', '+1 555-0102'),
             const SizedBox(height: AppSpacing.sm),
-            _buildContactCard('Dr. Anderson', 'Doctor', '+1 555-0103'),
+            _buildContactCard(context, 'Dr. Anderson', 'Doctor', '+1 555-0103'),
             const SizedBox(height: AppSpacing.xl),
 
             // Emergency Status

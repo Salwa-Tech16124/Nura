@@ -31,10 +31,11 @@ class NuraApp extends ConsumerWidget {
       builder: (context, child) {
         final screenWidth = MediaQuery.of(context).size.width;
         final isDesktop = screenWidth > 600;
+        final isDark = Theme.of(context).brightness == Brightness.dark;
 
         if (isDesktop && child != null) {
           return Scaffold(
-            backgroundColor: const Color(0xFFECEFF1), // Soft gray desktop background
+            backgroundColor: isDark ? const Color(0xFF050510) : const Color(0xFFECEFF1),
             body: Center(
               child: Container(
                 width: 412, // Standard Android viewport width

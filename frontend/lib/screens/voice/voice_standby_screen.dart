@@ -25,19 +25,18 @@ class _VoiceStandbyScreenState extends State<VoiceStandbyScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFE8F1F5), // Light sky-blue
-              Color(0xFFE0F7FA), // Light cyan
-              Color(0xFFEDE7F6), // Light lavender
-            ],
+            colors: isDark
+                ? [const Color(0xFF0A0C16), const Color(0xFF0D1020), const Color(0xFF121625)]
+                : [const Color(0xFFE8F1F5), const Color(0xFFE0F7FA), const Color(0xFFEDE7F6)],
           ),
         ),
         child: SafeArea(
@@ -48,10 +47,10 @@ class _VoiceStandbyScreenState extends State<VoiceStandbyScreen> {
                 const SizedBox(height: AppSpacing.lg),
                 
                 // Title Header
-                const Text(
+                Text(
                   'NURA Voice AI -\nReady to Listen.',
                   style: TextStyle(
-                    color: Color(0xFF1E244A),
+                    color: isDark ? Colors.white : const Color(0xFF1E244A),
                     fontWeight: FontWeight.w900,
                     fontSize: 22,
                     letterSpacing: 0.5,
@@ -93,8 +92,7 @@ class _VoiceStandbyScreenState extends State<VoiceStandbyScreen> {
                         ),
                       ),
                       
-                      // Floating Orbital Pins (to match Slide 1 details)
-                      // Pin 1: Top-Left (Cloud)
+                      // Floating Orbital Pins
                       Positioned(
                         left: 45,
                         top: 45,
@@ -102,14 +100,13 @@ class _VoiceStandbyScreenState extends State<VoiceStandbyScreen> {
                           width: 28,
                           height: 28,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFC2F3F8), // Cyan
+                            color: const Color(0xFFC2F3F8),
                             shape: BoxShape.circle,
-                            border: Border.all(color: Colors.black, width: 1.5),
+                            border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.5),
                           ),
                           child: const Icon(Icons.wb_cloudy_rounded, color: Colors.black, size: 12),
                         ),
                       ),
-                      // Pin 2: Right (Smile)
                       Positioned(
                         right: 20,
                         top: 120,
@@ -117,14 +114,13 @@ class _VoiceStandbyScreenState extends State<VoiceStandbyScreen> {
                           width: 28,
                           height: 28,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFE5D5FF), // Lilac
+                            color: const Color(0xFFE5D5FF),
                             shape: BoxShape.circle,
-                            border: Border.all(color: Colors.black, width: 1.5),
+                            border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.5),
                           ),
                           child: const Icon(Icons.sentiment_satisfied_alt_rounded, color: Colors.black, size: 14),
                         ),
                       ),
-                      // Pin 3: Bottom-Left (Heart)
                       Positioned(
                         left: 55,
                         bottom: 45,
@@ -132,26 +128,26 @@ class _VoiceStandbyScreenState extends State<VoiceStandbyScreen> {
                           width: 28,
                           height: 28,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFDCBE0), // Pink
+                            color: const Color(0xFFFDCBE0),
                             shape: BoxShape.circle,
-                            border: Border.all(color: Colors.black, width: 1.5),
+                            border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.5),
                           ),
                           child: const Icon(Icons.favorite_rounded, color: Colors.black, size: 12),
                         ),
                       ),
   
-                      // Center Robot Assistant Avatar (matching new uploaded premium design)
+                      // Center Robot Assistant Avatar
                       Container(
                         width: 130,
                         height: 130,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.black, width: 2),
-                          boxShadow: const [
+                          border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 2),
+                          boxShadow: [
                             BoxShadow(
-                              color: Colors.black26,
+                              color: isDark ? Colors.white10 : Colors.black26,
                               blurRadius: 12,
-                              offset: Offset(0, 4),
+                              offset: const Offset(0, 4),
                             ),
                           ],
                         ),
@@ -169,12 +165,12 @@ class _VoiceStandbyScreenState extends State<VoiceStandbyScreen> {
                 const SizedBox(height: AppSpacing.lg),
                 
                 // Helper Instructions
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
                   child: Text(
                     'Our AI-powered voice assistant is here to listen, guide, and support your healthcare — anytime, anywhere.',
                     style: TextStyle(
-                      color: Colors.black87,
+                      color: isDark ? Colors.white70 : Colors.black87,
                       fontSize: 14,
                       height: 1.4,
                       fontWeight: FontWeight.bold,
@@ -186,14 +182,14 @@ class _VoiceStandbyScreenState extends State<VoiceStandbyScreen> {
                 const SizedBox(height: AppSpacing.md),
                 
                 // Try speech hint
-                const Text(
+                Text(
                   'Try saying:',
-                  style: TextStyle(color: Colors.black54, fontSize: 13, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: isDark ? Colors.white54 : Colors.black54, fontSize: 13, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 4),
-                const Text(
+                Text(
                   '"What medicine now?"',
-                  style: TextStyle(color: Color(0xFF1E244A), fontSize: 18, fontWeight: FontWeight.w900),
+                  style: TextStyle(color: isDark ? Colors.white : const Color(0xFF1E244A), fontSize: 18, fontWeight: FontWeight.w900),
                 ),
                 
                 const SizedBox(height: AppSpacing.md),
@@ -207,10 +203,10 @@ class _VoiceStandbyScreenState extends State<VoiceStandbyScreen> {
                       // Skip button leads back to home
                       TextButton(
                         onPressed: () => context.go('/home'),
-                        child: const Text(
+                        child: Text(
                           'Skip',
                           style: TextStyle(
-                            color: Colors.black54,
+                            color: isDark ? Colors.white54 : Colors.black54,
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
                           ),
@@ -224,25 +220,25 @@ class _VoiceStandbyScreenState extends State<VoiceStandbyScreen> {
                           width: 68,
                           height: 120,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: isDark ? const Color(0xFF121625) : Colors.white,
                             borderRadius: BorderRadius.circular(34),
                             border: Border.all(
-                              color: Colors.black,
+                              color: isDark ? Colors.white24 : Colors.black,
                               width: 1.8,
                             ),
-                            boxShadow: const [
+                            boxShadow: [
                               BoxShadow(
-                                color: Colors.black,
-                                offset: Offset(2, 2),
+                                color: isDark ? Colors.white10 : Colors.black,
+                                offset: const Offset(2, 2),
                               ),
                             ],
                           ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.keyboard_double_arrow_up_rounded, 
-                                color: Colors.black54, 
+                                color: isDark ? Colors.white54 : Colors.black54, 
                                 size: 20,
                               ),
                               const Spacer(),
@@ -253,12 +249,12 @@ class _VoiceStandbyScreenState extends State<VoiceStandbyScreen> {
                                 margin: const EdgeInsets.all(4),
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: const Color(0xFFC2F3F8), // Cyan
-                                  border: Border.all(color: Colors.black, width: 1.5),
-                                  boxShadow: const [
+                                  color: const Color(0xFFC2F3F8),
+                                  border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.5),
+                                  boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black,
-                                      offset: Offset(1, 1),
+                                      color: isDark ? Colors.white10 : Colors.black,
+                                      offset: const Offset(1, 1),
                                     ),
                                   ],
                                 ),
@@ -279,10 +275,10 @@ class _VoiceStandbyScreenState extends State<VoiceStandbyScreen> {
                       ),
   
                       // Slide Index
-                      const Text(
+                      Text(
                         '1/6',
                         style: TextStyle(
-                          color: Colors.black54,
+                          color: isDark ? Colors.white54 : Colors.black54,
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
                         ),

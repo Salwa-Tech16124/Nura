@@ -15,8 +15,9 @@ class MedicationHistoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: isDark ? const Color(0xFF0A0C16) : AppColors.background,
       appBar: const CustomAppBar(title: 'Medication Adherence History'),
       body: PageContainer(
         child: ScrollablePageLayout(
@@ -29,10 +30,10 @@ class MedicationHistoryScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Today\'s Adherence', style: AppTypography.h3),
+                        Text('Today\'s Adherence', style: AppTypography.h3.copyWith(color: isDark ? Colors.white : null)),
                         const SizedBox(height: AppSpacing.sm),
-                        Text('Taken: 4', style: AppTypography.bodyMedium),
-                        Text('Missed: 1', style: AppTypography.bodyMedium),
+                        Text('Taken: 4', style: AppTypography.bodyMedium.copyWith(color: isDark ? Colors.white70 : null)),
+                        Text('Missed: 1', style: AppTypography.bodyMedium.copyWith(color: isDark ? Colors.white70 : null)),
                         const SizedBox(height: AppSpacing.sm),
                         Text('Success Rate: 80%', style: AppTypography.bodyLarge.copyWith(color: AppColors.success, fontWeight: FontWeight.bold)),
                       ],

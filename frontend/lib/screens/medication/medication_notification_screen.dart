@@ -32,8 +32,9 @@ class _MedicationNotificationScreenState extends State<MedicationNotificationScr
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: isDark ? const Color(0xFF0A0C16) : AppColors.background,
       appBar: const CustomAppBar(title: 'Medication Reminder'),
       body: PageContainer(
         child: ScrollablePageLayout(
@@ -61,27 +62,27 @@ class _MedicationNotificationScreenState extends State<MedicationNotificationScr
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Status', style: AppTypography.bodyMedium),
+                      Text('Status', style: AppTypography.bodyMedium.copyWith(color: isDark ? Colors.white70 : null)),
                       const PendingBadge(label: 'Pending'),
                     ],
                   ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: AppSpacing.sm),
-                    child: Divider(color: AppColors.border),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                    child: Divider(color: isDark ? Colors.white24 : AppColors.border),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Scheduled Time', style: AppTypography.bodyMedium),
-                      Text('8:00 AM', style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold)),
+                      Text('Scheduled Time', style: AppTypography.bodyMedium.copyWith(color: isDark ? Colors.white70 : null)),
+                      Text('8:00 AM', style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold, color: isDark ? Colors.white : null)),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Current Time', style: AppTypography.bodyMedium),
-                      Text('8:05 AM', style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold)),
+                      Text('Current Time', style: AppTypography.bodyMedium.copyWith(color: isDark ? Colors.white70 : null)),
+                      Text('8:05 AM', style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold, color: isDark ? Colors.white : null)),
                     ],
                   ),
                 ],

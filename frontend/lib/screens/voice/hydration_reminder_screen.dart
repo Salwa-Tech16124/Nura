@@ -7,8 +7,9 @@ class HydrationReminderScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: const Color(0xFFE8F1F5), // Light sky-blue background
+      backgroundColor: isDark ? const Color(0xFF0A0C16) : const Color(0xFFE8F1F5),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.xl),
@@ -16,10 +17,10 @@ class HydrationReminderScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
+              Text(
                 'Hydration\nReminder Set.',
                 style: TextStyle(
-                  color: Color(0xFF1E244A),
+                  color: isDark ? Colors.white : const Color(0xFF1E244A),
                   fontWeight: FontWeight.w900,
                   fontSize: 32,
                   height: 1.2,
@@ -35,37 +36,37 @@ class HydrationReminderScreen extends StatelessWidget {
                   height: 180,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.white,
-                    border: Border.all(color: Colors.black, width: 2.0),
-                    boxShadow: const [
+                    color: isDark ? const Color(0xFF121625) : Colors.white,
+                    border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 2.0),
+                    boxShadow: [
                       BoxShadow(
-                        color: Colors.black26,
+                        color: isDark ? Colors.white10 : Colors.black26,
                         blurRadius: 10,
-                        offset: Offset(0, 4),
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
-                  child: const Center(
-                    child: Icon(Icons.local_drink, size: 90, color: Color(0xFF1E244A)),
+                  child: Center(
+                    child: Icon(Icons.local_drink, size: 90, color: isDark ? Colors.white : const Color(0xFF1E244A)),
                   ),
                 ),
               ),
               
               const Spacer(flex: 1),
-              const Text(
+              Text(
                 'Hydration Reminder Set.',
                 style: TextStyle(
-                  color: Colors.black,
+                  color: isDark ? Colors.white : Colors.black,
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.xl),
-              const Text(
+              Text(
                 'Next Reminder:',
                 style: TextStyle(
-                  color: Colors.black54,
+                  color: isDark ? Colors.white54 : Colors.black54,
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
                 ),
@@ -82,15 +83,15 @@ class HydrationReminderScreen extends StatelessWidget {
               ),
               const Spacer(flex: 1),
               
-              // Got It Button in pastel green neobrutalist style
+              // Got It Button
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFC3F3C0), // Green
+                  backgroundColor: const Color(0xFFC3F3C0),
                   foregroundColor: Colors.black,
                   minimumSize: const Size(double.infinity, 56),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(28),
-                    side: const BorderSide(color: Colors.black, width: 1.8),
+                    side: BorderSide(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
                   ),
                   elevation: 0,
                   shadowColor: Colors.black,

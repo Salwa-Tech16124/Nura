@@ -72,6 +72,7 @@ class TimelineItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     Color nodeColor = AppColors.primary;
     IconData nodeIcon = Icons.schedule;
     
@@ -98,7 +99,7 @@ class TimelineItem extends StatelessWidget {
                 child: Icon(nodeIcon, color: AppColors.textInverse, size: 16),
               ),
               if (!isLast)
-                Expanded(child: Container(width: 2, color: AppColors.border)),
+                Expanded(child: Container(width: 2, color: isDark ? Colors.white24 : AppColors.border)),
             ],
           ),
           const SizedBox(width: AppSpacing.md),
@@ -112,9 +113,9 @@ class TimelineItem extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(title, style: AppTypography.bodyLarge),
+                        Text(title, style: AppTypography.bodyLarge.copyWith(color: isDark ? Colors.white : null)),
                         const SizedBox(height: AppSpacing.xs),
-                        Text(subtitle, style: AppTypography.bodySmall),
+                        Text(subtitle, style: AppTypography.bodySmall.copyWith(color: isDark ? Colors.white70 : null)),
                       ],
                     ),
                   ),
@@ -140,12 +141,13 @@ class SettingTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: ReusableIconButton(icon: icon, onPressed: () {}, color: AppColors.textSecondary),
-      title: Text(title, style: AppTypography.bodyLarge),
-      subtitle: subtitle != null ? Text(subtitle!, style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary)) : null,
-      trailing: trailing ?? const Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.textSecondary),
+      leading: ReusableIconButton(icon: icon, onPressed: () {}, color: isDark ? Colors.white54 : AppColors.textSecondary),
+      title: Text(title, style: AppTypography.bodyLarge.copyWith(color: isDark ? Colors.white : null)),
+      subtitle: subtitle != null ? Text(subtitle!, style: AppTypography.bodySmall.copyWith(color: isDark ? Colors.white54 : AppColors.textSecondary)) : null,
+      trailing: trailing ?? Icon(Icons.arrow_forward_ios, size: 16, color: isDark ? Colors.white54 : AppColors.textSecondary),
       onTap: onTap,
     );
   }
@@ -161,10 +163,11 @@ class CustomListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return ListTile(
       leading: leading,
-      title: Text(title, style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold)),
-      subtitle: Text(subtitle, style: AppTypography.bodyMedium),
+      title: Text(title, style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold, color: isDark ? Colors.white : null)),
+      subtitle: Text(subtitle, style: AppTypography.bodyMedium.copyWith(color: isDark ? Colors.white70 : null)),
       trailing: trailing,
     );
   }

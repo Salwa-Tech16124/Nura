@@ -25,20 +25,23 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
   }
 
   Widget _buildCard(String flag, String lang, String sub, BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isSelected = _selectedLanguage == lang;
     return GestureDetector(
       onTap: () => _selectLanguage(lang, context),
       child: Container(
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFC3F3C0) : Colors.white, // Green active, white inactive
+          color: isSelected 
+              ? const Color(0xFFC3F3C0) 
+              : (isDark ? const Color(0xFF121625) : Colors.white),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: Colors.black,
+            color: isDark ? Colors.white24 : Colors.black,
             width: isSelected ? 2.2 : 1.8,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black,
+              color: isDark ? Colors.white10 : Colors.black,
               offset: isSelected ? const Offset(2, 4) : const Offset(1, 2),
             ),
           ],
@@ -50,11 +53,19 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
             const SizedBox(height: AppSpacing.sm),
             Text(
               lang,
-              style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: 16),
+              style: TextStyle(
+                color: isSelected ? Colors.black : (isDark ? Colors.white : Colors.black), 
+                fontWeight: FontWeight.w900, 
+                fontSize: 16,
+              ),
             ),
             Text(
               sub,
-              style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.bold, fontSize: 12),
+              style: TextStyle(
+                color: isSelected ? Colors.black54 : (isDark ? Colors.white54 : Colors.black54), 
+                fontWeight: FontWeight.bold, 
+                fontSize: 12,
+              ),
             ),
           ],
         ),
@@ -64,13 +75,14 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: const Color(0xFFE8F1F5), // Light sky-blue background
+      backgroundColor: isDark ? const Color(0xFF0A0C16) : const Color(0xFFE8F1F5),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
+          icon: Icon(Icons.arrow_back_ios_new, color: isDark ? Colors.white : Colors.black),
           onPressed: () => context.pop(),
         ),
       ),
@@ -81,13 +93,13 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: AppSpacing.md),
-              const Text(
+              Text(
                 'Choose Your',
-                style: TextStyle(color: Colors.black54, fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(color: isDark ? Colors.white54 : Colors.black54, fontSize: 16, fontWeight: FontWeight.bold),
               ),
-              const Text(
+              Text(
                 'Language',
-                style: TextStyle(color: Color(0xFF1E244A), fontSize: 32, fontWeight: FontWeight.w900),
+                style: TextStyle(color: isDark ? Colors.white : const Color(0xFF1E244A), fontSize: 32, fontWeight: FontWeight.w900),
               ),
               const SizedBox(height: AppSpacing.xxl),
               

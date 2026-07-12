@@ -49,17 +49,18 @@ class HealthCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return BaseCard(
       backgroundColor: accentColor,
       child: Row(
         children: [
-          Icon(icon, color: AppColors.textPrimary, size: 28),
+          Icon(icon, color: isDark ? Colors.white : AppColors.textPrimary, size: 28),
           const SizedBox(width: AppSpacing.sm),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: AppTypography.bodyMedium.copyWith(color: AppColors.textPrimary)),
-              Text(value, style: AppTypography.h3),
+              Text(title, style: AppTypography.bodyMedium.copyWith(color: isDark ? Colors.white70 : AppColors.textPrimary)),
+              Text(value, style: AppTypography.h3.copyWith(color: isDark ? Colors.white : AppColors.textPrimary)),
             ],
           ),
         ],
@@ -80,6 +81,7 @@ class MedicineCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return BaseCard(
       onTap: onTap,
       child: Row(
@@ -92,8 +94,8 @@ class MedicineCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(name, style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600)),
-                  Text(dosage, style: AppTypography.bodySmall),
+                  Text(name, style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600, color: isDark ? Colors.white : null)),
+                  Text(dosage, style: AppTypography.bodySmall.copyWith(color: isDark ? Colors.white70 : null)),
                 ],
               ),
             ],
@@ -102,7 +104,7 @@ class MedicineCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(time, style: AppTypography.bodyMedium),
+              Text(time, style: AppTypography.bodyMedium.copyWith(color: isDark ? Colors.white70 : null)),
               if (statusBadge != null) ...[
                 const SizedBox(height: AppSpacing.xs),
                 statusBadge!,
@@ -151,6 +153,7 @@ class ReportCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return BaseCard(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -158,7 +161,7 @@ class ReportCard extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold)),
+              Text(title, style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold, color: isDark ? Colors.white : null)),
               Text(status, style: AppTypography.bodySmall.copyWith(color: AppColors.secondary)),
             ],
           ),
@@ -177,13 +180,14 @@ class InformationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return BaseCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: AppTypography.h3),
+          Text(title, style: AppTypography.h3.copyWith(color: isDark ? Colors.white : AppColors.textPrimary)),
           const SizedBox(height: AppSpacing.xs),
-          Text(description, style: AppTypography.bodyMedium),
+          Text(description, style: AppTypography.bodyMedium.copyWith(color: isDark ? Colors.white70 : AppColors.textPrimary)),
         ],
       ),
     );

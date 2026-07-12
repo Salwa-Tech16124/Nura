@@ -14,8 +14,9 @@ class ConfirmMedicationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: isDark ? const Color(0xFF0A0C16) : AppColors.background,
       appBar: const CustomAppBar(title: 'Confirm Medication'),
       body: PageContainer(
         child: ScrollablePageLayout(
@@ -51,7 +52,7 @@ class ConfirmMedicationScreen extends StatelessWidget {
                   const SizedBox(height: AppSpacing.md),
                   Text(
                     'Have you taken this medication?',
-                    style: AppTypography.h3,
+                    style: AppTypography.h3.copyWith(color: isDark ? Colors.white : null),
                     textAlign: TextAlign.center,
                   ),
                 ],

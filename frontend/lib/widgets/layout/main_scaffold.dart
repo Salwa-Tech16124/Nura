@@ -16,14 +16,16 @@ class MainScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: isDark ? const Color(0xFF0A0C16) : AppColors.background,
       body: navigationShell,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: navigationShell.currentIndex,
         onTap: (index) => _onTap(context, index),
-        selectedItemColor: AppColors.primary,
-        unselectedItemColor: AppColors.textSecondary,
+        selectedItemColor: isDark ? const Color(0xFF00E5FF) : AppColors.primary,
+        unselectedItemColor: isDark ? Colors.white54 : AppColors.textSecondary,
+        backgroundColor: isDark ? const Color(0xFF121625) : null,
         showUnselectedLabels: true,
         type: BottomNavigationBarType.fixed,
         items: const [
