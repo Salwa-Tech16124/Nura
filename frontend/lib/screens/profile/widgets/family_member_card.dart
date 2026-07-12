@@ -18,32 +18,47 @@ class FamilyMemberCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return BaseCard(
       child: Row(
         children: [
           CircleAvatar(
             radius: 28,
-            backgroundColor: AppColors.pastelBlue,
-            child: Text(name[0], style: AppTypography.h3.copyWith(color: AppColors.primary)),
+            backgroundColor: isDark ? const Color(0xFF1A2340) : AppColors.pastelBlue,
+            child: Text(name[0], style: AppTypography.h3.copyWith(color: isDark ? Colors.white : AppColors.primary)),
           ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name, style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold)),
-                Text(relationship, style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary)),
-                Text(phone, style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary)),
+                Text(name, style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold, color: isDark ? Colors.white : null)),
+                Text(relationship, style: AppTypography.bodySmall.copyWith(color: isDark ? Colors.white54 : AppColors.textSecondary)),
+                Text(phone, style: AppTypography.bodySmall.copyWith(color: isDark ? Colors.white54 : AppColors.textSecondary)),
               ],
             ),
           ),
           IconButton(
             icon: const Icon(Icons.message, color: AppColors.primary),
-            onPressed: () {},
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Messaging $name...'),
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+            },
           ),
           IconButton(
             icon: const Icon(Icons.phone, color: AppColors.success),
-            onPressed: () {},
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Calling $name at $phone...'),
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+            },
           ),
         ],
       ),

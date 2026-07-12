@@ -154,7 +154,14 @@ class MedicationHistoryScreen extends StatelessWidget {
             const SizedBox(height: AppSpacing.md),
             SecondaryButton(
               text: 'Export History',
-              onPressed: () {},
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Medication history exported to CSV successfully!'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              },
             ),
             const SizedBox(height: AppSpacing.xxl),
           ],

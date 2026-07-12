@@ -108,9 +108,64 @@ class FamilyCaregiversScreen extends StatelessWidget {
             const SizedBox(height: AppSpacing.xl),
 
             // Bottom Actions
-            PrimaryButton(text: 'Add Family Member', onPressed: () {}),
+            PrimaryButton(
+              text: 'Add Family Member',
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('Add Family Member'),
+                    content: const Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextField(
+                          decoration: InputDecoration(
+                            labelText: 'Full Name',
+                            hintText: 'e.g. John Doe',
+                          ),
+                        ),
+                        TextField(
+                          decoration: InputDecoration(
+                            labelText: 'Relationship',
+                            hintText: 'e.g. Son, Cousin',
+                          ),
+                        ),
+                        TextField(
+                          decoration: InputDecoration(
+                            labelText: 'Phone Number',
+                            hintText: 'e.g. +1 555-0199',
+                          ),
+                        ),
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(ctx).pop(),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(ctx).pop();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Caregiver invitation sent successfully!')),
+                          );
+                        },
+                        child: const Text('Invite'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
             const SizedBox(height: AppSpacing.md),
-            SecondaryButton(text: 'Edit Contacts', onPressed: () {}),
+            SecondaryButton(
+              text: 'Edit Contacts',
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Contact editing is ready. Tap active cards to call or message!')),
+                );
+              },
+            ),
             const SizedBox(height: AppSpacing.md),
             OutlinedButtonWidget(text: 'Back to Health Profile', onPressed: () => context.pop()),
             

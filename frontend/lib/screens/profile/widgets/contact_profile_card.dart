@@ -17,16 +17,26 @@ class ContactProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    // In dark mode, use a deeper green with white text. In light mode, use light green with black text.
+    final cardBgColor = isDark ? const Color(0xFF1E3A1E) : const Color(0xFFC3F3C0);
+    final primaryTextColor = isDark ? Colors.white : Colors.black;
+    final secondaryTextColor = isDark ? Colors.white70 : Colors.black54;
+    final iconColor = isDark ? Colors.white : Colors.black87;
+    final buttonBgColor = isDark ? const Color(0xFF2C4C2C) : Colors.white;
+    final borderColor = isDark ? Colors.white24 : Colors.black;
+
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: const Color(0xFFC3F3C0), // Vibrant Green
+        color: cardBgColor,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.black, width: 1.8),
-        boxShadow: const [
+        border: Border.all(color: borderColor, width: 1.8),
+        boxShadow: [
           BoxShadow(
-            color: Colors.black,
-            offset: Offset(2, 4),
+            color: isDark ? Colors.white10 : Colors.black,
+            offset: const Offset(2, 4),
           ),
         ],
       ),
@@ -35,16 +45,16 @@ class ContactProfileCard extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.black, width: 1.8),
+              border: Border.all(color: borderColor, width: 1.8),
             ),
             child: CircleAvatar(
               radius: 24,
-              backgroundColor: Colors.white,
+              backgroundColor: isDark ? const Color(0xFF2C4C2C) : Colors.white,
               child: Text(
                 name[0], 
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.w900, 
-                  color: Colors.black,
+                  color: primaryTextColor,
                   fontSize: 16,
                 ),
               ),
@@ -57,25 +67,25 @@ class ContactProfileCard extends StatelessWidget {
               children: [
                 Text(
                   name, 
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w900, 
-                    color: Colors.black,
+                    color: primaryTextColor,
                     fontSize: 15,
                   ),
                 ),
                 Text(
                   relationship, 
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold, 
-                    color: Colors.black54,
+                    color: secondaryTextColor,
                     fontSize: 12,
                   ),
                 ),
                 Text(
                   phoneNumber, 
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold, 
-                    color: Colors.black54,
+                    color: secondaryTextColor,
                     fontSize: 12,
                   ),
                 ),
@@ -89,17 +99,17 @@ class ContactProfileCard extends StatelessWidget {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: buttonBgColor,
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.black, width: 1.8),
-                boxShadow: const [
+                border: Border.all(color: borderColor, width: 1.8),
+                boxShadow: [
                   BoxShadow(
-                    color: Colors.black,
-                    offset: Offset(1, 2),
+                    color: isDark ? Colors.white10 : Colors.black,
+                    offset: const Offset(1, 2),
                   ),
                 ],
               ),
-              child: const Icon(Icons.phone, color: Colors.black87, size: 20),
+              child: Icon(Icons.phone, color: iconColor, size: 20),
             ),
           ),
         ],

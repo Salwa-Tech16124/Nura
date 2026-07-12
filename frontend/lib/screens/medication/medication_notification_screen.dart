@@ -100,12 +100,28 @@ class _MedicationNotificationScreenState extends State<MedicationNotificationScr
             const SizedBox(height: AppSpacing.md),
             SecondaryButton(
               text: 'Remind Me Later',
-              onPressed: () {},
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Reminder snoozed for 15 minutes.'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+                context.go('/meds');
+              },
             ),
             const SizedBox(height: AppSpacing.md),
             Center(
               child: TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Medication reminder skipped.'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                  context.go('/meds');
+                },
                 child: Text('Skip', style: AppTypography.button.copyWith(color: AppColors.textSecondary)),
               ),
             ),

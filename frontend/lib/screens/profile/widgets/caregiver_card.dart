@@ -18,8 +18,9 @@ class CaregiverCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return BaseCard(
-      backgroundColor: AppColors.primaryLight,
+      backgroundColor: isDark ? const Color(0xFF1A2340) : AppColors.primaryLight,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -33,10 +34,10 @@ class CaregiverCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name, style: AppTypography.h3),
-                Text(relationship, style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary)),
+                Text(name, style: AppTypography.h3.copyWith(color: isDark ? Colors.white : null)),
+                Text(relationship, style: AppTypography.bodySmall.copyWith(color: isDark ? Colors.white60 : AppColors.textSecondary)),
                 const SizedBox(height: AppSpacing.xs),
-                Text(phone, style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.bold)),
+                Text(phone, style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.bold, color: isDark ? Colors.white : null)),
                 const SizedBox(height: AppSpacing.sm),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
@@ -51,7 +52,14 @@ class CaregiverCard extends StatelessWidget {
           ),
           IconButton(
             icon: const Icon(Icons.phone, color: AppColors.success, size: 28),
-            onPressed: () {},
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Calling $name at $phone...'),
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+            },
           ),
         ],
       ),

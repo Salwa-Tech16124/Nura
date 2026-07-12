@@ -32,7 +32,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             Image.asset('assets/images/branding/nura_app_icon.png', height: 28),
             const SizedBox(width: AppSpacing.sm),
           ],
-          Text(title, style: AppTypography.h2.copyWith(color: titleColor)),
+          Flexible(
+            child: Text(
+              title,
+              style: AppTypography.h2.copyWith(color: titleColor),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
         ],
       ),
       actions: actions,

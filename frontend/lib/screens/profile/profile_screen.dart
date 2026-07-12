@@ -159,14 +159,28 @@ class ProfileScreen extends ConsumerWidget {
               name: 'Sarah Doe',
               relationship: 'Daughter',
               phoneNumber: '+1 987 654 3210',
-              onCall: () {},
+              onCall: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Calling Sarah Doe (+1 987 654 3210)...'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              },
             ),
             const SizedBox(height: AppSpacing.md),
             ContactProfileCard(
               name: 'Mike Doe',
               relationship: 'Son',
               phoneNumber: '+1 555 123 4567',
-              onCall: () {},
+              onCall: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Calling Mike Doe (+1 555 123 4567)...'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              },
             ),
             const SizedBox(height: AppSpacing.xl),
 

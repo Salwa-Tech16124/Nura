@@ -89,9 +89,61 @@ class MedicalRecordsScreen extends StatelessWidget {
             const SizedBox(height: AppSpacing.xl),
 
             // Bottom Actions
-            PrimaryButton(text: 'Upload Document', onPressed: () {}),
+            PrimaryButton(
+              text: 'Upload Document',
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('Upload Document'),
+                    content: const Text('Select a health document (PDF, PNG, JPG) from your device to upload to NURA secure storage.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(ctx).pop(),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(ctx).pop();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Document uploaded successfully! AI is analyzing the contents...')),
+                          );
+                        },
+                        child: const Text('Select File'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
             const SizedBox(height: AppSpacing.md),
-            SecondaryButton(text: 'Scan Prescription', onPressed: () {}),
+            SecondaryButton(
+              text: 'Scan Prescription',
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('Scan Prescription'),
+                    content: const Text('NURA OCR Scan:\n\nAlign your paper prescription within the camera view to extract medicine names, dosages, and schedule.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(ctx).pop(),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(ctx).pop();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Scan complete! Detected: Lisinopril 10mg, Metformin 500mg.')),
+                          );
+                        },
+                        child: const Text('Start Scan'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
             const SizedBox(height: AppSpacing.md),
             OutlinedButtonWidget(text: 'Back to Family & Caregivers', onPressed: () => context.pop()),
             

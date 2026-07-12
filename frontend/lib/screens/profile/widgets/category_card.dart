@@ -18,19 +18,33 @@ class CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return BaseCard(
       child: Row(
         children: [
-          Icon(icon, color: AppColors.primary, size: 24),
+          Icon(icon, color: isDark ? Colors.white70 : AppColors.primary, size: 24),
           const SizedBox(width: AppSpacing.md),
-          Expanded(child: Text(title, style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold))),
+          Expanded(
+            child: Text(
+              title,
+              style: AppTypography.bodyLarge.copyWith(
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : null,
+              ),
+            ),
+          ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
             decoration: BoxDecoration(
-              color: AppColors.primaryLight,
+              color: isDark ? const Color(0xFF1D2235) : AppColors.primaryLight,
               borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
             ),
-            child: Text('$fileCount Files', style: AppTypography.bodySmall.copyWith(color: AppColors.primary)),
+            child: Text(
+              '$fileCount Files',
+              style: AppTypography.bodySmall.copyWith(
+                color: isDark ? Colors.white70 : AppColors.primary,
+              ),
+            ),
           ),
         ],
       ),

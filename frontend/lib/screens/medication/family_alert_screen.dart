@@ -17,8 +17,8 @@ class FamilyAlertScreen extends StatelessWidget {
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor: AppColors.primaryLight,
-            child: Text(name[0], style: AppTypography.h3.copyWith(color: AppColors.primary)),
+            backgroundColor: isDark ? const Color(0xFF1D2235) : AppColors.primaryLight,
+            child: Text(name[0], style: AppTypography.h3.copyWith(color: isDark ? Colors.white : AppColors.primary)),
           ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
@@ -46,7 +46,14 @@ class FamilyAlertScreen extends StatelessWidget {
               const SizedBox(width: AppSpacing.md),
               IconButton(
                 icon: const Icon(Icons.phone, color: AppColors.error, size: 28),
-                onPressed: () {},
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Calling $name at $phone...'),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                },
               ),
             ],
           ),
@@ -152,7 +159,14 @@ class FamilyAlertScreen extends StatelessWidget {
             // Bottom Actions
             PrimaryButton(
               text: 'Call Primary Contact',
-              onPressed: () {},
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Calling Sarah (Daughter) at +1 555-0101...'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              },
             ),
             const SizedBox(height: AppSpacing.md),
             SecondaryButton(

@@ -16,19 +16,34 @@ class OcrHistoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return BaseCard(
       child: Row(
         children: [
-          const Icon(Icons.document_scanner, color: AppColors.primary, size: 24),
+          Icon(Icons.document_scanner, color: isDark ? Colors.white70 : AppColors.primary, size: 24),
           const SizedBox(width: AppSpacing.md),
-          Expanded(child: Text(title, style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.bold))),
+          Expanded(
+            child: Text(
+              title,
+              style: AppTypography.bodyMedium.copyWith(
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : null,
+              ),
+            ),
+          ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
             decoration: BoxDecoration(
-              color: AppColors.successLight.withOpacity(0.3),
+              color: isDark ? Colors.green.withOpacity(0.2) : AppColors.successLight.withOpacity(0.3),
               borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
             ),
-            child: Text(status, style: AppTypography.bodySmall.copyWith(color: AppColors.success, fontWeight: FontWeight.bold)),
+            child: Text(
+              status,
+              style: AppTypography.bodySmall.copyWith(
+                color: isDark ? Colors.greenAccent : AppColors.success,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),
