@@ -883,25 +883,28 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
                       final rec = entry.value;
                       return Theme(
                         data: ThemeData.light(),
-                        child: CheckboxListTile(
-                          contentPadding: EdgeInsets.zero,
-                          title: Text(rec['text'], style: TextStyle(
-                            decoration: rec['completed'] ? TextDecoration.lineThrough : null,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                            fontSize: 15,
-                          )),
-                          subtitle: Text(rec['desc'], style: const TextStyle(fontSize: 12, color: Colors.black87)),
-                          value: rec['completed'],
-                          activeColor: Colors.black,
-                          checkColor: Colors.white,
-                          onChanged: (bool? val) {
-                            if (val != null) {
-                              setState(() {
-                                _recommendations[index]['completed'] = val;
-                              });
-                            }
-                          },
+                        child: Material(
+                          color: Colors.transparent,
+                          child: CheckboxListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: Text(rec['text'], style: TextStyle(
+                              decoration: rec['completed'] ? TextDecoration.lineThrough : null,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                              fontSize: 15,
+                            )),
+                            subtitle: Text(rec['desc'], style: const TextStyle(fontSize: 12, color: Colors.black87)),
+                            value: rec['completed'],
+                            activeColor: Colors.black,
+                            checkColor: Colors.white,
+                            onChanged: (bool? val) {
+                              if (val != null) {
+                                setState(() {
+                                  _recommendations[index]['completed'] = val;
+                                });
+                              }
+                            },
+                          ),
                         ),
                       );
                     }).toList(),
