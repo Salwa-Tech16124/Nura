@@ -116,7 +116,7 @@ class ProfileScreen extends StatelessWidget {
               age: '34 Years',
               gender: 'Female',
               bloodGroup: 'O+',
-              onEdit: () {},
+              onEdit: () => context.push('/health-profile'),
             ),
             const SizedBox(height: AppSpacing.xl),
 
@@ -234,7 +234,7 @@ class ProfileScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(28),
                   ),
                 ),
-                onPressed: () {},
+                onPressed: () => context.push('/health-profile'),
                 child: const Text(
                   'Edit Profile',
                   style: TextStyle(
@@ -269,7 +269,7 @@ class ProfileScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(28),
                   ),
                 ),
-                onPressed: () {},
+                onPressed: () => context.go('/login'),
                 child: const Text(
                   'Logout',
                   style: TextStyle(
