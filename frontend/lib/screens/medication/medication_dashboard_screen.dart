@@ -11,7 +11,6 @@ class MedicationDashboardScreen extends StatefulWidget {
 }
 
 class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
-
   final bool _hasMedicines = true; // Toggle for empty state testing
   
   final List<Map<String, dynamic>> _upcomingMedicines = [
@@ -33,13 +32,13 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
   ];
 
   // Local helper for section headers
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(String title, {required bool isDark}) {
     return Padding(
       padding: const EdgeInsets.only(top: AppSpacing.lg, bottom: AppSpacing.sm),
       child: Text(
         title,
-        style: const TextStyle(
-          color: Colors.black,
+        style: TextStyle(
+          color: isDark ? Colors.white : Colors.black,
           fontSize: 16,
           fontWeight: FontWeight.w900,
         ),
@@ -75,7 +74,8 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
   }
 
   // Neobrutalist medicine card builder
-  Widget _buildNeobrutalistMedicineCard({
+  Widget _buildNeobrutalistMedicineCard(
+    BuildContext context, {
     required String name,
     required String dosage,
     required String time,
@@ -83,16 +83,17 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
     required Color iconBgColor,
     required IconData icon,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF121625) : Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.black, width: 1.8),
-        boxShadow: const [
+        border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
+        boxShadow: [
           BoxShadow(
-            color: Colors.black,
-            offset: Offset(2, 4),
+            color: isDark ? Colors.white10 : Colors.black,
+            offset: const Offset(2, 4),
           ),
         ],
       ),
@@ -119,11 +120,11 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
                 children: [
                   Text(
                     name, 
-                    style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.black, fontSize: 14),
+                    style: TextStyle(fontWeight: FontWeight.w900, color: isDark ? Colors.white : Colors.black, fontSize: 14),
                   ),
                   Text(
                     dosage, 
-                    style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black54, fontSize: 12),
+                    style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black54, fontSize: 12),
                   ),
                 ],
               ),
@@ -135,7 +136,7 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
             children: [
               Text(
                 time, 
-                style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.black, fontSize: 13),
+                style: TextStyle(fontWeight: FontWeight.w900, color: isDark ? Colors.white : Colors.black, fontSize: 13),
               ),
               const SizedBox(height: AppSpacing.xs),
               statusBadge,
@@ -146,7 +147,8 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
     );
   }
 
-  Widget _buildTimelineCard(Map<String, dynamic> med, bool isLast) {
+  Widget _buildTimelineCard(BuildContext context, Map<String, dynamic> med, bool isLast) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     Widget badge = _buildNeobrutalistStatusBadge(med['status']);
 
     return IntrinsicHeight(
@@ -164,14 +166,14 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
                   decoration: BoxDecoration(
                     color: med['status'] == 'Taken' ? const Color(0xFFC3F3C0) : const Color(0xFFFDCBE0),
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.black, width: 1.8),
+                    border: Border.all(color: isDark ? Colors.white70 : Colors.black, width: 1.8),
                   ),
                 ),
                 if (!isLast)
                   Expanded(
                     child: Container(
                       width: 2,
-                      color: Colors.black,
+                      color: isDark ? Colors.white24 : Colors.black,
                     ),
                   ),
               ],
@@ -182,6 +184,7 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
             child: Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.md),
               child: _buildNeobrutalistMedicineCard(
+                context,
                 name: med['name'],
                 dosage: '1 Pill',
                 time: med['time'],
@@ -198,22 +201,24 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFE8F1F5), // Light sky-blue neobrutalist background
+      backgroundColor: isDark ? const Color(0xFF0A0C16) : const Color(0xFFE8F1F5), // Dynamic neobrutalist background
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
+        title: Text(
           'Medication Reminder',
           style: TextStyle(
-            color: Colors.black,
+            color: isDark ? Colors.white : Colors.black,
             fontWeight: FontWeight.w900,
             fontSize: 20,
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, color: isDark ? Colors.white : Colors.black, size: 20),
           onPressed: () => context.go('/home'),
         ),
         actions: [
@@ -223,12 +228,12 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
               margin: const EdgeInsets.only(top: 8, bottom: 8),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.black, width: 1.8),
+                border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
               ),
-              child: const CircleAvatar(
+              child: CircleAvatar(
                 radius: 18,
-                backgroundColor: Colors.white,
-                child: Icon(Icons.person, color: Colors.black, size: 18),
+                backgroundColor: isDark ? const Color(0xFF121625) : Colors.white,
+                child: Icon(Icons.person, color: isDark ? Colors.white : Colors.black, size: 18),
               ),
             ),
           )
@@ -238,10 +243,10 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
         child: ScrollablePageLayout(
           children: [
             const SizedBox(height: AppSpacing.sm),
-            const Text(
+            Text(
               'Stay on track with today\'s medications.',
               style: TextStyle(
-                color: Colors.black87,
+                color: isDark ? Colors.white70 : Colors.black87,
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
               ),
@@ -253,13 +258,13 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
               margin: const EdgeInsets.only(bottom: AppSpacing.lg),
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark ? const Color(0xFF121625) : Colors.white,
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: Colors.black, width: 1.8),
-                boxShadow: const [
+                border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
+                boxShadow: [
                   BoxShadow(
-                    color: Colors.black,
-                    offset: Offset(2, 4),
+                    color: isDark ? Colors.white10 : Colors.black,
+                    offset: const Offset(2, 4),
                   )
                 ],
               ),
@@ -275,21 +280,21 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  const Text(
+                  Text(
                     'Daily Medication Tracker',
                     style: TextStyle(
                       fontWeight: FontWeight.w900,
-                      color: Colors.black,
+                      color: isDark ? Colors.white : Colors.black,
                       fontSize: 16,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: AppSpacing.xs),
-                  const Text(
+                  Text(
                     'Stay healthy by tracking your pill schedule and prescriptions.',
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      color: Colors.black54,
+                      color: isDark ? Colors.white70 : Colors.black54,
                       fontSize: 13,
                     ),
                     textAlign: TextAlign.center,
@@ -304,20 +309,23 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(AppSpacing.xl),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDark ? const Color(0xFF121625) : Colors.white,
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: Colors.black, width: 1.8),
-                    boxShadow: const [
-                      BoxShadow(color: Colors.black, offset: Offset(2, 4)),
+                    border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: isDark ? Colors.white10 : Colors.black,
+                        offset: const Offset(2, 4),
+                      ),
                     ],
                   ),
-                  child: const Column(
+                  child: Column(
                     children: [
-                      Icon(Icons.medication_liquid, size: 60, color: Colors.black87),
-                      SizedBox(height: AppSpacing.sm),
+                      Icon(Icons.medication_liquid, size: 60, color: isDark ? Colors.white : Colors.black87),
+                      const SizedBox(height: AppSpacing.sm),
                       Text(
                         'No medicines scheduled for today.',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black, fontSize: 14),
                       ),
                     ],
                   ),
@@ -325,33 +333,33 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
               ),
             ] else ...[
               // Adherence Progress
-              _buildSectionHeader('Today\'s Adherence'),
+              _buildSectionHeader('Today\'s Adherence', isDark: isDark),
               Container(
                 padding: const EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark ? const Color(0xFF121625) : Colors.white,
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.black, width: 1.8),
-                  boxShadow: const [
+                  border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
+                  boxShadow: [
                     BoxShadow(
-                      color: Colors.black,
-                      offset: Offset(2, 4),
+                      color: isDark ? Colors.white10 : Colors.black,
+                      offset: const Offset(2, 4),
                     ),
                   ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Row(
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           '2 of 5 medicines taken today', 
-                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87, fontSize: 13),
+                          style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black87, fontSize: 13),
                         ),
                         Text(
                           '40% Completed', 
-                          style: TextStyle(fontWeight: FontWeight.w900, color: Colors.black, fontSize: 13),
+                          style: TextStyle(fontWeight: FontWeight.w900, color: isDark ? Colors.white : Colors.black, fontSize: 13),
                         ),
                       ],
                     ),
@@ -361,9 +369,9 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
                       height: 12,
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: isDark ? Colors.white.withAlpha(10) : Colors.white,
                         borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: Colors.black, width: 1.5),
+                        border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.5),
                       ),
                       child: FractionallySizedBox(
                         alignment: Alignment.centerLeft,
@@ -382,8 +390,9 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
               const SizedBox(height: AppSpacing.lg),
 
               // Today's Medication Card
-              _buildSectionHeader('Today\'s Medication'),
+              _buildSectionHeader('Today\'s Medication', isDark: isDark),
               _buildNeobrutalistMedicineCard(
+                context,
                 name: 'Lisinopril 10mg',
                 dosage: '1 Pill',
                 time: '9:00 AM',
@@ -394,20 +403,20 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
               const SizedBox(height: AppSpacing.lg),
 
               // Upcoming Medicines Timeline
-              _buildSectionHeader('Upcoming Medicines'),
+              _buildSectionHeader('Upcoming Medicines', isDark: isDark),
               if (_upcomingMedicines.isEmpty)
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.md),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDark ? const Color(0xFF121625) : Colors.white,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.black, width: 1.8),
+                    border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
                   ),
-                  child: const Text('No upcoming medicines.', style: TextStyle(fontWeight: FontWeight.bold)),
+                  child: Text('No upcoming medicines.', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black)),
                 )
               else
                 ...List.generate(_upcomingMedicines.length, (index) {
-                  return _buildTimelineCard(_upcomingMedicines[index], index == _upcomingMedicines.length - 1);
+                  return _buildTimelineCard(context, _upcomingMedicines[index], index == _upcomingMedicines.length - 1);
                 }),
               const SizedBox(height: AppSpacing.lg),
 
@@ -419,11 +428,11 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(28),
                   color: const Color(0xFFC2F3F8), // Cyan
-                  border: Border.all(color: Colors.black, width: 1.8),
-                  boxShadow: const [
+                  border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
+                  boxShadow: [
                     BoxShadow(
-                      color: Colors.black,
-                      offset: Offset(2, 4),
+                      color: isDark ? Colors.white10 : Colors.black,
+                      offset: const Offset(2, 4),
                     ),
                   ],
                 ),
@@ -455,11 +464,11 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(28),
                   color: const Color(0xFFFDCBE0), // Pink
-                  border: Border.all(color: Colors.black, width: 1.8),
-                  boxShadow: const [
+                  border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
+                  boxShadow: [
                     BoxShadow(
-                      color: Colors.black,
-                      offset: Offset(2, 4),
+                      color: isDark ? Colors.white10 : Colors.black,
+                      offset: const Offset(2, 4),
                     ),
                   ],
                 ),
@@ -491,11 +500,11 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
                 decoration: BoxDecoration(
                   color: const Color(0xFFFED782), // Soft Yellow
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.black, width: 1.8),
-                  boxShadow: const [
+                  border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
+                  boxShadow: [
                     BoxShadow(
-                      color: Colors.black,
-                      offset: Offset(2, 4),
+                      color: isDark ? Colors.white10 : Colors.black,
+                      offset: const Offset(2, 4),
                     ),
                   ],
                 ),
@@ -557,11 +566,11 @@ class _MedicationDashboardScreenState extends State<MedicationDashboardScreen> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(28),
                 color: const Color(0xFFE5D5FF), // Lilac
-                border: Border.all(color: Colors.black, width: 1.8),
-                boxShadow: const [
+                border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
+                boxShadow: [
                   BoxShadow(
-                    color: Colors.black,
-                    offset: Offset(2, 4),
+                    color: isDark ? Colors.white10 : Colors.black,
+                    offset: const Offset(2, 4),
                   ),
                 ],
               ),

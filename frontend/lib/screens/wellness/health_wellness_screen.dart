@@ -297,22 +297,24 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
     final selectedMedData = _medicineDb[_selectedMedicine]!;
     final double completionRate = _completionPercentage;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFE8F1F5), // Light sky-blue neobrutalist backdrop
+      backgroundColor: isDark ? const Color(0xFF0A0C16) : const Color(0xFFE8F1F5), // Light sky-blue neobrutalist backdrop
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
+        title: Text(
           'Health & Wellness',
           style: TextStyle(
-            color: Colors.black,
+            color: isDark ? Colors.white : Colors.black,
             fontWeight: FontWeight.w900,
             fontSize: 20,
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, color: isDark ? Colors.white : Colors.black, size: 20),
           onPressed: () => context.go('/home'),
         ),
       ),
@@ -327,13 +329,13 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
               margin: const EdgeInsets.only(bottom: AppSpacing.md),
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark ? const Color(0xFF121625) : Colors.white,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.black, width: 1.8),
-                boxShadow: const [
+                border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
+                boxShadow: [
                   BoxShadow(
-                    color: Colors.black,
-                    offset: Offset(2, 4),
+                    color: isDark ? Colors.white10 : Colors.black,
+                    offset: const Offset(2, 4),
                   ),
                 ],
               ),
@@ -352,7 +354,7 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
                           'AI Health Timeline',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: _selectedTab == 0 ? Colors.black : Colors.black54,
+                            color: _selectedTab == 0 ? Colors.black : (isDark ? Colors.white60 : Colors.black54),
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
@@ -373,7 +375,7 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
                           'Health Trends & Vitals',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: _selectedTab == 1 ? Colors.black : Colors.black54,
+                            color: _selectedTab == 1 ? Colors.black : (isDark ? Colors.white60 : Colors.black54),
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
@@ -392,13 +394,13 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
                 margin: const EdgeInsets.only(bottom: AppSpacing.lg),
                 padding: const EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark ? const Color(0xFF121625) : Colors.white,
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.black, width: 1.8),
-                  boxShadow: const [
+                  border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
+                  boxShadow: [
                     BoxShadow(
-                      color: Colors.black,
-                      offset: Offset(2, 4),
+                      color: isDark ? Colors.white10 : Colors.black,
+                      offset: const Offset(2, 4),
                     )
                   ],
                 ),
@@ -414,21 +416,21 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
                       ),
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    const Text(
+                    Text(
                       'AI Health & Care Companion',
                       style: TextStyle(
                         fontWeight: FontWeight.w900,
-                        color: Colors.black,
+                        color: isDark ? Colors.white : Colors.black,
                         fontSize: 16,
                       ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: AppSpacing.xs),
-                    const Text(
+                    Text(
                       'Monitor your daily routine and receive smart wellness insights.',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
-                        color: Colors.black54,
+                        color: isDark ? Colors.white70 : Colors.black54,
                         fontSize: 13,
                       ),
                       textAlign: TextAlign.center,

@@ -21,8 +21,10 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFEEF3F0), // Premium light sage-green background
+      backgroundColor: isDark ? const Color(0xFF0A0C16) : const Color(0xFFEEF3F0), // Premium light sage-green background
       body: PageContainer(
         padding: EdgeInsets.zero, // Zero padding to allow full edge-to-edge sheet curves
         child: SingleChildScrollView(
@@ -153,9 +155,9 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
 
               // Bottom White content sheet (Self-care tabs and actions grid)
               Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF121625) : Colors.white,
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(36),
                     topRight: Radius.circular(36),
                   ),

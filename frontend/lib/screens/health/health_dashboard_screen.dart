@@ -6,24 +6,26 @@ import '../../widgets/layout/page_container.dart';
 class HealthDashboardScreen extends StatelessWidget {
   const HealthDashboardScreen({super.key});
 
-  Widget _buildVitalsCard({
+  Widget _buildVitalsCard(
+    BuildContext context, {
     required String title,
     required IconData icon,
     required Widget content,
     required Color iconBgColor,
     bool showChevron = false,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.lg),
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF121625) : Colors.white,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.black, width: 1.8),
-        boxShadow: const [
+        border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
+        boxShadow: [
           BoxShadow(
-            color: Colors.black,
-            offset: Offset(2, 4),
+            color: isDark ? Colors.white10 : Colors.black,
+            offset: const Offset(2, 4),
           )
         ],
       ),
@@ -47,15 +49,15 @@ class HealthDashboardScreen extends StatelessWidget {
               const SizedBox(width: AppSpacing.sm),
               Text(
                 title, 
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.w900,
-                  color: Colors.black,
+                  color: isDark ? Colors.white : Colors.black,
                   fontSize: 16,
                 ),
               ),
               if (showChevron) ...[
                 const Spacer(),
-                const Icon(Icons.keyboard_arrow_down, color: Colors.black, size: 20),
+                Icon(Icons.keyboard_arrow_down, color: isDark ? Colors.white : Colors.black, size: 20),
               ],
             ],
           ),
@@ -66,7 +68,8 @@ class HealthDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSaveRow(String hintText) {
+  Widget _buildSaveRow(BuildContext context, String hintText) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(
       children: [
         Expanded(
@@ -74,15 +77,15 @@ class HealthDashboardScreen extends StatelessWidget {
             height: 44,
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDark ? Colors.white.withAlpha(10) : Colors.white,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.black.withAlpha(25), width: 1.2),
+              border: Border.all(color: isDark ? Colors.white24 : Colors.black.withAlpha(25), width: 1.2),
             ),
             child: TextField(
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
               decoration: InputDecoration(
                 hintText: hintText,
-                hintStyle: const TextStyle(color: Colors.black38, fontSize: 13),
+                hintStyle: TextStyle(color: isDark ? Colors.white38 : Colors.black38, fontSize: 13),
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.zero,
               ),
@@ -96,11 +99,11 @@ class HealthDashboardScreen extends StatelessWidget {
           decoration: BoxDecoration(
             color: const Color(0xFFC3F3C0), // Vibrant Green neobrutalist
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.black, width: 1.8),
-            boxShadow: const [
+            border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
+            boxShadow: [
               BoxShadow(
-                color: Colors.black,
-                offset: Offset(1, 2),
+                color: isDark ? Colors.white10 : Colors.black,
+                offset: const Offset(1, 2),
               ),
             ],
           ),
@@ -124,22 +127,24 @@ class HealthDashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFE8F1F5), // Light sky-blue neobrutalist background
+      backgroundColor: isDark ? const Color(0xFF0A0C16) : const Color(0xFFE8F1F5), // Dynamic neobrutalist background
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
+        title: Text(
           'Vitals',
           style: TextStyle(
-            color: Colors.black,
+            color: isDark ? Colors.white : Colors.black,
             fontWeight: FontWeight.w900,
             fontSize: 20,
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, color: isDark ? Colors.white : Colors.black, size: 20),
           onPressed: () => context.go('/home'),
         ),
       ),
@@ -155,13 +160,13 @@ class HealthDashboardScreen extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: AppSpacing.lg),
                 padding: const EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark ? const Color(0xFF121625) : Colors.white,
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.black, width: 1.8),
-                  boxShadow: const [
+                  border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
+                  boxShadow: [
                     BoxShadow(
-                      color: Colors.black,
-                      offset: Offset(2, 4),
+                      color: isDark ? Colors.white10 : Colors.black,
+                      offset: const Offset(2, 4),
                     )
                   ],
                 ),
@@ -177,21 +182,21 @@ class HealthDashboardScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    const Text(
+                    Text(
                       'Your Personal Health Tracker',
                       style: TextStyle(
                         fontWeight: FontWeight.w900,
-                        color: Colors.black,
+                        color: isDark ? Colors.white : Colors.black,
                         fontSize: 16,
                       ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: AppSpacing.xs),
-                    const Text(
+                    Text(
                       'Log your vitals, monitor medicines, and view reports.',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
-                        color: Colors.black54,
+                        color: isDark ? Colors.white70 : Colors.black54,
                         fontSize: 13,
                       ),
                       textAlign: TextAlign.center,
@@ -201,24 +206,28 @@ class HealthDashboardScreen extends StatelessWidget {
               ),
               
               _buildVitalsCard(
+                context,
                 title: 'Blood Pressure',
                 icon: Icons.favorite_border_rounded,
                 iconBgColor: const Color(0xFFFDCBE0), // Pink
-                content: _buildSaveRow('e.g. 120/80'),
+                content: _buildSaveRow(context, 'e.g. 120/80'),
               ),
               _buildVitalsCard(
+                context,
                 title: 'Blood Sugar',
                 icon: Icons.bloodtype_outlined,
                 iconBgColor: const Color(0xFFFED782), // Yellow
-                content: _buildSaveRow('e.g. 95 mg/dL'),
+                content: _buildSaveRow(context, 'e.g. 95 mg/dL'),
               ),
               _buildVitalsCard(
+                context,
                 title: 'Weight',
                 icon: Icons.monitor_weight_outlined,
                 iconBgColor: const Color(0xFFC2F3F8), // Cyan
-                content: _buildSaveRow('e.g. 170 lbs'),
+                content: _buildSaveRow(context, 'e.g. 170 lbs'),
               ),
               _buildVitalsCard(
+                context,
                 title: 'Symptoms',
                 icon: Icons.emoji_emotions_outlined,
                 iconBgColor: const Color(0xFFE5D5FF), // Lilac
@@ -254,6 +263,7 @@ class HealthDashboardScreen extends StatelessWidget {
                 ),
               ),
               _buildVitalsCard(
+                context,
                 title: 'Medicines',
                 icon: Icons.medication_outlined,
                 iconBgColor: const Color(0xFFC3F3C0), // Green
@@ -261,21 +271,21 @@ class HealthDashboardScreen extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.check_box, color: Colors.black, size: 20),
+                        Icon(Icons.check_box, color: isDark ? Colors.white : Colors.black, size: 20),
                         const SizedBox(width: AppSpacing.xs),
-                        const Text('Metformin', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87)),
+                        Text('Metformin', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black87)),
                         const SizedBox(width: AppSpacing.md),
-                        const Icon(Icons.check_box_outline_blank, color: Colors.black54, size: 20),
+                        Icon(Icons.check_box_outline_blank, color: isDark ? Colors.white38 : Colors.black54, size: 20),
                         const SizedBox(width: AppSpacing.xs),
-                        const Text('Lisinopril', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87)),
+                        Text('Lisinopril', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black87)),
                       ],
                     ),
                     const SizedBox(height: AppSpacing.md),
                     Row(
                       children: [
-                        const Icon(Icons.check_box_outline_blank, color: Colors.black54, size: 20),
+                        Icon(Icons.check_box_outline_blank, color: isDark ? Colors.white38 : Colors.black54, size: 20),
                         const SizedBox(width: AppSpacing.xs),
-                        const Text('Lisinopril', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87)),
+                        Text('Lisinopril', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black87)),
                         const Spacer(),
                         // Neobrutalist Save Button for medicines card
                         Container(
@@ -283,11 +293,11 @@ class HealthDashboardScreen extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: const Color(0xFFC3F3C0), // Vibrant Green neobrutalist
                             borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: Colors.black, width: 1.8),
-                            boxShadow: const [
+                            border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
+                            boxShadow: [
                               BoxShadow(
-                                color: Colors.black,
-                                offset: Offset(1, 2),
+                                color: isDark ? Colors.white10 : Colors.black,
+                                offset: const Offset(1, 2),
                               ),
                             ],
                           ),

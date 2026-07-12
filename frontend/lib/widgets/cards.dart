@@ -13,16 +13,21 @@ class BaseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = backgroundColor == AppColors.surface
+        ? (isDark ? const Color(0xFF121625) : AppColors.surface)
+        : backgroundColor;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          color: backgroundColor,
+          color: cardBg,
           borderRadius: borderRadius ?? BorderRadius.circular(AppSpacing.radiusLg),
           boxShadow: [
             BoxShadow(
-              color: AppColors.textPrimary.withOpacity(0.05),
+              color: isDark ? Colors.white10 : AppColors.textPrimary.withOpacity(0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             )
