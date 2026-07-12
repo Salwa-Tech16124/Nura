@@ -73,10 +73,18 @@ class RegisterScreen extends StatelessWidget {
                     left: 0,
                     right: 0,
                     child: Center(
-                      child: Image.asset(
-                        'assets/images/branding/signup_character.png',
-                        height: 160,
-                        fit: BoxFit.contain,
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Image.asset(
+                          'assets/images/branding/signup_illustration.jpg',
+                          height: 120,
+                          width: 120,
+                          fit: BoxFit.contain,
+                        ),
                       ),
                     ),
                   ),
