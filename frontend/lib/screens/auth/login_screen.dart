@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/constants/app_spacing.dart';
 import '../../widgets/layout/page_container.dart';
-import '../onboarding/onboarding_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -301,4 +300,274 @@ class LoginWavePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// ------------------------------------------------------------
+// Local CartoonFace definition to fix onboarding refactoring dependency
+// ------------------------------------------------------------
+class CartoonFace extends StatefulWidget {
+  final int pageIndex;
+  const CartoonFace({super.key, required this.pageIndex});
+
+  @override
+  State<CartoonFace> createState() => _CartoonFaceState();
+}
+
+class _CartoonFaceState extends State<CartoonFace> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _pupilOffsetAnimation;
+  late Animation<double> _blinkAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 4),
+    )..repeat(reverse: true);
+
+    _pupilOffsetAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 5.0).chain(CurveTween(curve: Curves.easeInOut)), weight: 20),
+      TweenSequenceItem(tween: ConstantTween(5.0), weight: 30),
+      TweenSequenceItem(tween: Tween(begin: 5.0, end: -5.0).chain(CurveTween(curve: Curves.easeInOut)), weight: 20),
+      TweenSequenceItem(tween: ConstantTween(-5.0), weight: 30),
+    ]).animate(_controller);
+
+    _blinkAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: ConstantTween(1.0), weight: 90),
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.0).chain(CurveTween(curve: Curves.easeIn)), weight: 5),
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.0).chain(CurveTween(curve: Curves.easeOut)), weight: 5),
+    ]).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return SizedBox(
+          width: 140,
+          height: 90,
+          child: Stack(
+            alignment: Alignment.center,
+            clipBehavior: Clip.none,
+            children: [
+              if (widget.pageIndex == 1) ...[
+                Positioned(
+                  left: 0,
+                  top: 35,
+                  child: Container(
+                    width: 24,
+                    height: 14,
+                    decoration: BoxDecoration(
+                      color: Colors.pinkAccent.withAlpha(80),
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  right: 0,
+                  top: 35,
+                  child: Container(
+                    width: 24,
+                    height: 14,
+                    decoration: BoxDecoration(
+                      color: Colors.pinkAccent.withAlpha(80),
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                  ),
+                ),
+              ],
+
+              // Left Eye
+              Positioned(
+                left: 20,
+                top: 15,
+                child: Transform.scale(
+                  scaleY: _blinkAnimation.value,
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Transform.translate(
+                        offset: Offset(_pupilOffsetAnimation.value, 0),
+                        child: Container(
+                          width: 20,
+                          height: 20,
+                          decoration: const BoxDecoration(
+                            color: Colors.black,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Align(
+                            alignment: const Alignment(-0.35, -0.35),
+                            child: Container(
+                              width: 6,
+                              height: 6,
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Right Eye
+              Positioned(
+                right: 20,
+                top: 15,
+                child: Transform.scale(
+                  scaleY: _blinkAnimation.value,
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Transform.translate(
+                        offset: Offset(_pupilOffsetAnimation.value, 0),
+                        child: Container(
+                          width: 20,
+                          height: 20,
+                          decoration: const BoxDecoration(
+                            color: Colors.black,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Align(
+                            alignment: const Alignment(-0.35, -0.35),
+                            child: Container(
+                              width: 6,
+                              height: 6,
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Left Eyebrow
+              Positioned(
+                left: 22,
+                top: 5,
+                child: Transform.rotate(
+                  angle: widget.pageIndex == 1 ? -0.08 : 0.08,
+                  child: Container(
+                    width: 26,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Right Eyebrow
+              Positioned(
+                right: 22,
+                top: 5,
+                child: Transform.rotate(
+                  angle: widget.pageIndex == 1 ? 0.08 : -0.08,
+                  child: Container(
+                    width: 26,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Mouth
+              Positioned(
+                top: 62,
+                left: 47,
+                child: widget.pageIndex == 1
+                    ? _buildHappyMouth()
+                    : _buildTeethMouth(),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildTeethMouth() {
+    return Container(
+      width: 46,
+      height: 22,
+      decoration: const BoxDecoration(
+        color: Colors.black,
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(22),
+          bottomRight: Radius.circular(22),
+        ),
+      ),
+      child: Stack(
+        alignment: Alignment.topCenter,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(width: 8, height: 7, color: Colors.white),
+              const SizedBox(width: 2),
+              Container(width: 8, height: 7, color: Colors.white),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHappyMouth() {
+    return Container(
+      width: 38,
+      height: 28,
+      decoration: const BoxDecoration(
+        color: Colors.black,
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(19),
+          bottomRight: Radius.circular(19),
+        ),
+      ),
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: Container(
+          width: 22,
+          height: 11,
+          decoration: const BoxDecoration(
+            color: Colors.redAccent,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(11),
+              topRight: Radius.circular(11),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
