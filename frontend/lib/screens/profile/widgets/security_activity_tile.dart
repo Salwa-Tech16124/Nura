@@ -16,6 +16,7 @@ class SecurityActivityTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return BaseCard(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -34,9 +35,20 @@ class SecurityActivityTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(time, style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary, fontWeight: FontWeight.bold)),
+                Text(
+                  time, 
+                  style: AppTypography.bodySmall.copyWith(
+                    color: isDark ? Colors.white54 : AppColors.textSecondary, 
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: AppSpacing.xs),
-                Text(description, style: AppTypography.bodyMedium),
+                Text(
+                  description, 
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: isDark ? Colors.white : null,
+                  ),
+                ),
               ],
             ),
           ),

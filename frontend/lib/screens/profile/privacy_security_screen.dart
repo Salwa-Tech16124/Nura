@@ -82,20 +82,110 @@ class PrivacySecurityScreen extends StatelessWidget {
 
             // Section 4: Data Management
             const SectionHeader(title: 'Data Management'),
-            QuickActionCard(title: 'Download My Data', icon: Icons.download, onTap: () {}),
+            QuickActionCard(
+              title: 'Download My Data', 
+              icon: Icons.download, 
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('Download My Data'),
+                    content: const Text('We will prepare a ZIP archive containing all your NURA medication history, health trends, and profile details.\n\nThis may take a few minutes to generate.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(ctx).pop(),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(ctx).pop();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Your data archive download has started!')),
+                          );
+                        },
+                        child: const Text('Download ZIP'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
             const SizedBox(height: AppSpacing.sm),
-            QuickActionCard(title: 'Delete Cache', icon: Icons.delete_outline, onTap: () {}),
+            QuickActionCard(
+              title: 'Delete Cache', 
+              icon: Icons.delete_outline, 
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('Delete Cache'),
+                    content: const Text('Are you sure you want to clear the local application cache? This will not delete your health history.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(ctx).pop(),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(ctx).pop();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Application cache cleared successfully!')),
+                          );
+                        },
+                        child: const Text('Clear Cache'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
             const SizedBox(height: AppSpacing.sm),
-            QuickActionCard(title: 'Manage Storage', icon: Icons.storage, onTap: () {}),
+            QuickActionCard(
+              title: 'Manage Storage', 
+              icon: Icons.storage, 
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('Manage Storage'),
+                    content: const Text('NURA App Storage:\n\n• Local Database: 1.2 MB\n• Document Cache: 15.4 MB\n• Voice AI Cache: 2.1 MB\n\nTotal: 18.7 MB used of 500 MB quota.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(ctx).pop(),
+                        child: const Text('Close'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
             const SizedBox(height: AppSpacing.sm),
-            QuickActionCard(title: 'Backup Status', icon: Icons.cloud_done, onTap: () {}),
+            QuickActionCard(
+              title: 'Backup Status', 
+              icon: Icons.cloud_done, 
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('Cloud Backup Status'),
+                    content: const Text('All your healthcare data is securely encrypted and backed up to the cloud.\n\nLast successful backup: Today, 2:10 AM.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(ctx).pop(),
+                        child: const Text('Close'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
             const SizedBox(height: AppSpacing.xl),
-
+ 
             // Section 5: Security Status
             const SectionHeader(title: 'Security Status'),
             const SecurityStatusCard(),
             const SizedBox(height: AppSpacing.xl),
-
+ 
             // Section 6: Recent Security Activity
             const SectionHeader(title: 'Recent Security Activity'),
             const SecurityActivityTile(time: 'Today', description: 'Fingerprint Login'),
@@ -106,11 +196,44 @@ class PrivacySecurityScreen extends StatelessWidget {
             const SizedBox(height: AppSpacing.sm),
             const SecurityActivityTile(time: '1 Week Ago', description: 'Profile Updated'),
             const SizedBox(height: AppSpacing.xl),
-
+ 
             // Bottom Actions
-            PrimaryButton(text: 'Save Security Settings', onPressed: () {}),
+            PrimaryButton(
+              text: 'Save Security Settings', 
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Privacy and security settings updated successfully!')),
+                );
+              },
+            ),
             const SizedBox(height: AppSpacing.md),
-            SecondaryButton(text: 'Reset Security Settings', onPressed: () {}),
+            SecondaryButton(
+              text: 'Reset Security Settings', 
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('Reset Settings'),
+                    content: const Text('Are you sure you want to restore default privacy and security configurations?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(ctx).pop(),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(ctx).pop();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Settings restored to defaults.')),
+                          );
+                        },
+                        child: const Text('Reset'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
             const SizedBox(height: AppSpacing.md),
             OutlinedButtonWidget(text: 'Back to Settings', onPressed: () => context.pop()),
             

@@ -64,16 +64,18 @@ class SecondaryButton extends StatelessWidget {
 class OutlinedButtonWidget extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
-  final Color color;
+  final Color? color;
 
-  const OutlinedButtonWidget({super.key, required this.text, this.onPressed, this.color = AppColors.primary});
+  const OutlinedButtonWidget({super.key, required this.text, this.onPressed, this.color});
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final effectiveColor = color ?? (isDark ? Colors.white : AppColors.primary);
     return OutlinedButton(
       style: OutlinedButton.styleFrom(
-        foregroundColor: color,
-        side: BorderSide(color: color, width: 2),
+        foregroundColor: effectiveColor,
+        side: BorderSide(color: effectiveColor, width: 2),
         minimumSize: const Size.fromHeight(56),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusPill)),
       ),
@@ -83,7 +85,7 @@ class OutlinedButtonWidget extends StatelessWidget {
               AudioService().playButtonClick();
               onPressed!();
             },
-      child: Text(text, style: AppTypography.button.copyWith(color: color)),
+      child: Text(text, style: AppTypography.button.copyWith(color: effectiveColor)),
     );
   }
 }

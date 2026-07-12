@@ -168,16 +168,16 @@ class AboutNuraScreen extends StatelessWidget {
             // Section 5: Our Mission
             const SectionHeader(title: 'Our Mission'),
             BaseCard(
-              backgroundColor: AppColors.primaryLight,
+              backgroundColor: isDark ? const Color(0xFF1D2235) : AppColors.primaryLight,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.track_changes, color: AppColors.primary, size: 28),
+                  Icon(Icons.track_changes, color: isDark ? Colors.white : AppColors.primary, size: 28),
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Text(
                       'Empower every elderly person to live independently with confidence using intelligent healthcare technology.',
-                      style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold, color: AppColors.primary),
+                      style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold, color: isDark ? Colors.white : AppColors.primary),
                     ),
                   ),
                 ],
@@ -221,11 +221,50 @@ class AboutNuraScreen extends StatelessWidget {
             const SizedBox(height: AppSpacing.xxl),
 
             // Bottom Actions
-            PrimaryButton(text: 'Contact Support', onPressed: () {}),
+            PrimaryButton(
+              text: 'Contact Support',
+              onPressed: () {
+                _showInfoDialog(context, 'Contact Support', 'Email: support@nura.health\nPhone: +1 800-NURA-CARE\n\nSupport is available 24/7.');
+              },
+            ),
             const SizedBox(height: AppSpacing.md),
-            SecondaryButton(text: 'Rate NURA', onPressed: () {}),
+            SecondaryButton(
+              text: 'Rate NURA',
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('Rate NURA'),
+                    content: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(5, (index) => const Icon(Icons.star, color: Colors.amber, size: 36)),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(ctx).pop(),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(ctx).pop();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Thank you for rating NURA!')),
+                          );
+                        },
+                        child: const Text('Submit'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
             const SizedBox(height: AppSpacing.md),
-            OutlinedButtonWidget(text: 'Logout', onPressed: () {}),
+            OutlinedButtonWidget(
+              text: 'Logout',
+              onPressed: () {
+                context.go('/login');
+              },
+            ),
             
             const SizedBox(height: AppSpacing.xxl),
           ],
