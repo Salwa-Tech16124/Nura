@@ -15,20 +15,28 @@ class AboutNuraScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: isDark ? const Color(0xFF0A0C16) : AppColors.background,
       appBar: AppBar(
-        title: Text('About NURA', style: AppTypography.h2),
-        backgroundColor: AppColors.background,
+        title: Text('About NURA', style: AppTypography.h2.copyWith(color: isDark ? Colors.white : Colors.black)),
+        backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_new, color: isDark ? Colors.white : Colors.black, size: 20),
+          onPressed: () => context.pop(),
+        ),
       ),
       body: PageContainer(
         child: ScrollablePageLayout(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const SizedBox(height: AppSpacing.sm),
-            Text('Your AI-powered healthcare companion.', style: AppTypography.bodyLarge.copyWith(color: AppColors.textSecondary)),
+            Text(
+              'Your AI-powered healthcare companion.', 
+              style: AppTypography.bodyLarge.copyWith(color: isDark ? Colors.white70 : AppColors.textSecondary),
+            ),
             const SizedBox(height: AppSpacing.xl),
 
             // Section 1: Application Branding

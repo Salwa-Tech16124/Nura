@@ -255,13 +255,14 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(BuildContext context, String title) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
       child: Text(
         title,
-        style: const TextStyle(
-          color: Colors.black,
+        style: TextStyle(
+          color: isDark ? Colors.white : Colors.black,
           fontSize: 18,
           fontWeight: FontWeight.w900,
         ),
@@ -269,21 +270,26 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
     );
   }
 
-  Widget _buildNeobrutalistCard({
+  Widget _buildNeobrutalistCard(
+    BuildContext context, {
     required Widget child,
     Color backgroundColor = Colors.white,
     double elevation = 2.0,
     double borderSize = 1.8,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBgColor = backgroundColor == Colors.white
+        ? (isDark ? const Color(0xFF121625) : Colors.white)
+        : backgroundColor;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: cardBgColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.black, width: borderSize),
+        border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: borderSize),
         boxShadow: [
           BoxShadow(
-            color: Colors.black,
+            color: isDark ? Colors.white10 : Colors.black,
             offset: Offset(elevation, elevation * 2),
           ),
         ],
@@ -441,6 +447,7 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
 
               // 1. Daily Health Summary Highlight Card (Cyan)
               _buildNeobrutalistCard(
+                context,
                 backgroundColor: const Color(0xFFC2F3F8), // Cyan neobrutalist
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -515,8 +522,9 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
               const SizedBox(height: AppSpacing.lg),
 
               // AI Health Timeline
-              _buildSectionHeader('AI Health Timeline'),
+              _buildSectionHeader(context, 'AI Health Timeline'),
               _buildNeobrutalistCard(
+                context,
                 backgroundColor: Colors.white,
                 child: Padding(
                   padding: const EdgeInsets.all(AppSpacing.xs),
@@ -530,8 +538,9 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
               const SizedBox(height: AppSpacing.lg),
 
               // 4. Medicine Scanner Simulator
-              _buildSectionHeader('Medicine Scanner'),
+              _buildSectionHeader(context, 'Medicine Scanner'),
               _buildNeobrutalistCard(
+                context,
                 backgroundColor: const Color(0xFFFDCBE0), // Pink neobrutalist
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -617,8 +626,9 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
               const SizedBox(height: AppSpacing.lg),
 
               // 5. Medicine Information Lookup
-              _buildSectionHeader('Medicine Information Lookup'),
+              _buildSectionHeader(context, 'Medicine Information Lookup'),
               _buildNeobrutalistCard(
+                context,
                 backgroundColor: const Color(0xFFFED782), // Yellow neobrutalist
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -630,18 +640,18 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.black, width: 1.8),
                         borderRadius: BorderRadius.circular(16),
-                        color: Colors.white,
+                        color: isDark ? const Color(0xFF1E244A) : Colors.white,
                       ),
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<String>(
                           value: _selectedMedicine,
                           isExpanded: true,
-                          dropdownColor: Colors.white,
-                          icon: const Icon(Icons.arrow_drop_down, color: Colors.black),
+                          dropdownColor: isDark ? const Color(0xFF121625) : Colors.white,
+                          icon: Icon(Icons.arrow_drop_down, color: isDark ? Colors.white : Colors.black),
                           items: _medicineDb.keys.map((String key) {
                             return DropdownMenuItem<String>(
                               value: key,
-                              child: Text(key, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.black)),
+                              child: Text(key, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: isDark ? Colors.white : Colors.black)),
                             );
                           }).toList(),
                           onChanged: (String? val) {
@@ -660,8 +670,9 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
               const SizedBox(height: AppSpacing.lg),
 
               // 6. Voice Medicine Guide
-              _buildSectionHeader('Voice Medicine Guide'),
+              _buildSectionHeader(context, 'Voice Medicine Guide'),
               _buildNeobrutalistCard(
+                context,
                 backgroundColor: const Color(0xFFE5D5FF), // Lilac neobrutalist
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -737,7 +748,7 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
               const SizedBox(height: AppSpacing.lg),
             ] else ...[
               // 2. Health Status
-              _buildSectionHeader('Health Status'),
+              _buildSectionHeader(context, 'Health Status'),
               GridView.count(
                 crossAxisCount: 2,
                 shrinkWrap: true,
@@ -747,6 +758,7 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
                 childAspectRatio: 1.45,
                 children: [
                   _buildStatusCard(
+                    context,
                     title: 'Heart Health', 
                     value: '$_heartRate bpm', 
                     icon: Icons.favorite_rounded, 
@@ -755,6 +767,7 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
                     badgeText: 'Normal',
                   ),
                   _buildStatusCard(
+                    context,
                     title: 'Blood Pressure', 
                     value: '${_systolic.toStringAsFixed(0)}/${_diastolic.toStringAsFixed(0)}', 
                     icon: Icons.monitor_heart, 
@@ -763,6 +776,7 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
                     badgeText: 'Optimal',
                   ),
                   _buildStatusCard(
+                    context,
                     title: 'Hydration', 
                     value: '$_waterGlasses/$_waterGoal glasses', 
                     icon: Icons.water_drop_rounded, 
@@ -771,6 +785,7 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
                     badgeText: _waterGlasses >= 6 ? 'Good' : 'Low',
                   ),
                   _buildStatusCard(
+                    context,
                     title: 'Sleep Quality', 
                     value: '${_sleepHours.toStringAsFixed(1)} hrs', 
                     icon: Icons.bedtime, 
@@ -783,7 +798,7 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
               const SizedBox(height: AppSpacing.lg),
 
               // 3. Health Tracking
-              _buildSectionHeader('Health Metrics Log'),
+              _buildSectionHeader(context, 'Health Metrics Log'),
               GridView.count(
                 crossAxisCount: 2,
                 shrinkWrap: true,
@@ -793,6 +808,7 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
                 childAspectRatio: 1.25,
                 children: [
                   _buildMetricLogCard(
+                    context,
                     title: 'Heart Rate',
                     value: '$_heartRate bpm',
                     icon: Icons.favorite_rounded,
@@ -804,6 +820,7 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
                     }),
                   ),
                   _buildMetricLogCard(
+                    context,
                     title: 'Blood Pressure',
                     value: '${_systolic.toStringAsFixed(0)}/${_diastolic.toStringAsFixed(0)}',
                     icon: Icons.monitor_heart,
@@ -824,6 +841,7 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
                     }),
                   ),
                   _buildMetricLogCard(
+                    context,
                     title: 'Blood Sugar',
                     value: '$_bloodSugar mg/dL',
                     icon: Icons.water_drop,
@@ -835,6 +853,7 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
                     }),
                   ),
                   _buildMetricLogCard(
+                    context,
                     title: 'Body Temperature',
                     value: '${_temperature.toStringAsFixed(1)} °F',
                     icon: Icons.thermostat,
@@ -846,6 +865,7 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
                     }),
                   ),
                   _buildMetricLogCard(
+                    context,
                     title: 'Water Intake',
                     value: '$_waterGlasses / $_waterGoal',
                     icon: Icons.water_drop_outlined,
@@ -857,6 +877,7 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
                     }),
                   ),
                   _buildMetricLogCard(
+                    context,
                     title: 'Sleep Duration',
                     value: '${_sleepHours.toStringAsFixed(1)} hrs',
                     icon: Icons.bedtime,
@@ -872,8 +893,9 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
               const SizedBox(height: AppSpacing.lg),
 
               // 8. Health Recommendations List
-              _buildSectionHeader('Health Recommendations'),
+              _buildSectionHeader(context, 'Health Recommendations'),
               _buildNeobrutalistCard(
+                context,
                 backgroundColor: const Color(0xFFFED782), // Yellow neobrutalist
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -917,7 +939,7 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
             ],
 
             // 9. Coming Soon Section Roadmap Cards
-            _buildSectionHeader('Roadmap & Future Integrations'),
+            _buildSectionHeader(context, 'Roadmap & Future Integrations'),
             GridView.count(
               crossAxisCount: 2,
               shrinkWrap: true,
@@ -926,14 +948,14 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
               crossAxisSpacing: AppSpacing.md,
               childAspectRatio: 1.35,
               children: [
-                _buildComingSoonCard('OCR Prescriptions', Icons.document_scanner),
-                _buildComingSoonCard('Interaction Checker', Icons.compare_arrows),
-                _buildComingSoonCard('Wearable Integration', Icons.watch),
-                _buildComingSoonCard('Smart Watch Support', Icons.watch_rounded),
-                _buildComingSoonCard('Hospital System Link', Icons.local_hospital),
-                _buildComingSoonCard('Doctor Portal Access', Icons.badge_outlined),
-                _buildComingSoonCard('Family Dashboard', Icons.people),
-                _buildComingSoonCard('Medicine Delivery', Icons.local_shipping),
+                _buildComingSoonCard(context, 'OCR Prescriptions', Icons.document_scanner),
+                _buildComingSoonCard(context, 'Interaction Checker', Icons.compare_arrows),
+                _buildComingSoonCard(context, 'Wearable Integration', Icons.watch),
+                _buildComingSoonCard(context, 'Smart Watch Support', Icons.watch_rounded),
+                _buildComingSoonCard(context, 'Hospital System Link', Icons.local_hospital),
+                _buildComingSoonCard(context, 'Doctor Portal Access', Icons.badge_outlined),
+                _buildComingSoonCard(context, 'Family Dashboard', Icons.people),
+                _buildComingSoonCard(context, 'Medicine Delivery', Icons.local_shipping),
               ],
             ),
             const SizedBox(height: AppSpacing.xxl),
@@ -943,7 +965,8 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
     );
   }
 
-  Widget _buildStatusCard({
+  Widget _buildStatusCard(
+    BuildContext context, {
     required String title,
     required String value,
     required IconData icon,
@@ -951,6 +974,7 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
     required Color circleColor,
     required String badgeText,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     Color cardBgColor = Colors.white;
     if (title.contains('Heart')) {
       cardBgColor = const Color(0xFFFDCBE0); // Pink
@@ -967,11 +991,11 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
       decoration: BoxDecoration(
         color: cardBgColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.black, width: 1.8),
-        boxShadow: const [
+        border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
+        boxShadow: [
           BoxShadow(
-            color: Colors.black,
-            offset: Offset(2, 4),
+            color: isDark ? Colors.white10 : Colors.black,
+            offset: const Offset(2, 4),
           ),
         ],
       ),
@@ -1029,7 +1053,8 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
     );
   }
 
-  Widget _buildMetricLogCard({
+  Widget _buildMetricLogCard(
+    BuildContext context, {
     required String title,
     required String value,
     required IconData icon,
@@ -1037,16 +1062,17 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
     required Color color,
     required VoidCallback onEdit,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF121625) : Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.black, width: 1.8),
-        boxShadow: const [
+        border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
+        boxShadow: [
           BoxShadow(
-            color: Colors.black,
-            offset: Offset(2, 4),
+            color: isDark ? Colors.white10 : Colors.black,
+            offset: const Offset(2, 4),
           ),
         ],
       ),
@@ -1057,11 +1083,11 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
             top: 0,
             child: CircleAvatar(
               radius: 13,
-              backgroundColor: Colors.black.withAlpha(20),
+              backgroundColor: isDark ? Colors.white12 : Colors.black.withAlpha(20),
               child: IconButton(
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
-                icon: const Icon(Icons.edit, size: 13, color: Colors.black),
+                icon: Icon(Icons.edit, size: 13, color: isDark ? Colors.white : Colors.black),
                 onPressed: onEdit,
               ),
             ),
@@ -1085,13 +1111,13 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
               const SizedBox(height: AppSpacing.xs),
               Text(
                 title, 
-                style: const TextStyle(color: Colors.black54, fontSize: 11, fontWeight: FontWeight.bold),
+                style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontSize: 11, fontWeight: FontWeight.bold),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
               Text(
                 value, 
-                style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.black, fontSize: 14),
+                style: TextStyle(fontWeight: FontWeight.w900, color: isDark ? Colors.white : Colors.black, fontSize: 14),
               ),
             ],
           ),
@@ -1100,17 +1126,18 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
     );
   }
 
-  Widget _buildComingSoonCard(String title, IconData icon) {
+  Widget _buildComingSoonCard(BuildContext context, String title, IconData icon) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF121625) : Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.black, width: 1.8),
-        boxShadow: const [
+        border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.8),
+        boxShadow: [
           BoxShadow(
-            color: Colors.black,
-            offset: Offset(2, 4),
+            color: isDark ? Colors.white10 : Colors.black,
+            offset: const Offset(2, 4),
           ),
         ],
       ),
@@ -1122,18 +1149,18 @@ class _HealthWellnessScreenState extends State<HealthWellnessScreen> {
             width: 34,
             height: 34,
             decoration: BoxDecoration(
-              color: Colors.black.withAlpha(10),
+              color: isDark ? Colors.white12 : Colors.black.withAlpha(10),
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.black, width: 1.5),
+              border: Border.all(color: isDark ? Colors.white24 : Colors.black, width: 1.5),
             ),
-            child: const Center(
-              child: Icon(Icons.star_outline_rounded, color: Colors.black, size: 18),
+            child: Center(
+              child: Icon(icon, color: isDark ? Colors.white : Colors.black, size: 18),
             ),
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
             title, 
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black87),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: isDark ? Colors.white70 : Colors.black87),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

@@ -9,8 +9,9 @@ class StorageSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return BaseCard(
-      backgroundColor: AppColors.primaryLight,
+      backgroundColor: isDark ? const Color(0xFF1D2235) : AppColors.primaryLight,
       child: Column(
         children: [
           Row(
