@@ -2,7 +2,27 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api import auth, medicine, health, appointment, sos, family, reports, ai, diet, ocr, timeline
 
+from app.database.connection import engine, Base
+from app.database import models
+import traceback
+from fastapi import Request
+from fastapi.responses import JSONResponse
+
+# Create database tables automatically
+Base.metadata.create_all(bind=engine)
+
 app = FastAPI(title="AI Care Copilot API")
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=500,
+        content={
+            "message": "Internal Server Error",
+            "exception": str(exc),
+            "traceback": traceback.format_exc()
+        }
+    )
 
 app.add_middleware(
     CORSMiddleware,
