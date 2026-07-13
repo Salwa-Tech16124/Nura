@@ -11,7 +11,8 @@ from fastapi.responses import JSONResponse
 # Create database tables automatically
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="AI Care Copilot API")
+import os
+app = FastAPI(title="AI Care Copilot API", debug=os.getenv("DEBUG", "false").lower() == "true")
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):

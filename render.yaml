@@ -16,3 +16,5 @@ services:
         value: "30"
       - key: GEMINI_API_KEY
         sync: false
+      - key: DEBUG
+        value: "true"
