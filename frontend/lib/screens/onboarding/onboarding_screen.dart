@@ -142,116 +142,119 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                       ),
                       // Slide Content
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 50),
-                          // Upper portion: Cartoon illustration & Face
-                          SizedBox(
-                            height: 220,
-                            child: Stack(
-                              alignment: Alignment.center,
-                              clipBehavior: Clip.none,
-                              children: [
-                                // The floating app icon for Page 1
-                                if (index == 0)
-                                  Positioned(
-                                    top: 10,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(20),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withAlpha(40),
-                                            blurRadius: 15,
-                                            offset: const Offset(0, 5),
-                                          )
-                                        ],
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(20),
-                                        child: Image.asset(
-                                          'assets/images/branding/nura_app_icon.png', 
-                                          height: 55, 
-                                          width: 55,
-                                          fit: BoxFit.cover,
+                      SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 30),
+                            // Upper portion: Cartoon illustration & Face
+                            SizedBox(
+                              height: 220,
+                              child: Stack(
+                                alignment: Alignment.center,
+                                clipBehavior: Clip.none,
+                                children: [
+                                  // The floating app icon for Page 1
+                                  if (index == 0)
+                                    Positioned(
+                                      top: 10,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withAlpha(40),
+                                              blurRadius: 15,
+                                              offset: const Offset(0, 5),
+                                            )
+                                          ],
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(20),
+                                          child: Image.asset(
+                                            'assets/images/branding/nura_app_icon.png', 
+                                            height: 55, 
+                                            width: 55,
+                                            fit: BoxFit.cover,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                // Cute white medicine icon for Page 2
-                                if (index == 1)
-                                  Positioned(
-                                    top: 10,
-                                    child: Container(
-                                      padding: const EdgeInsets.all(AppSpacing.sm),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white.withAlpha(40),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(
-                                        Icons.medication,
-                                        size: 40,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                // Cute white sparkle icon for Page 3
-                                if (index == 2)
-                                  Positioned(
-                                    top: 10,
-                                    child: Container(
-                                      padding: const EdgeInsets.all(AppSpacing.sm),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white.withAlpha(40),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(
-                                        Icons.auto_awesome,
-                                        size: 40,
-                                        color: Colors.white,
+                                  // Cute white medicine icon for Page 2
+                                  if (index == 1)
+                                    Positioned(
+                                      top: 10,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(AppSpacing.sm),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withAlpha(40),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.medication,
+                                          size: 40,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     ),
+                                  // Cute white sparkle icon for Page 3
+                                  if (index == 2)
+                                    Positioned(
+                                      top: 10,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(AppSpacing.sm),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withAlpha(40),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.auto_awesome,
+                                          size: 40,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  // Animated cartoon face
+                                  Positioned(
+                                    top: 100,
+                                    child: CartoonFace(pageIndex: index),
                                   ),
-                                // Animated cartoon face
-                                Positioned(
-                                  top: 100,
-                                  child: CartoonFace(pageIndex: index),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                          const Spacer(),
-                          // Lower half content (white copy)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  _pages[index]['title']!.toUpperCase(),
-                                  style: AppTypography.h1.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w900,
-                                    fontSize: 28,
-                                    height: 1.2,
+                            const SizedBox(height: AppSpacing.lg),
+                            // Lower half content (white copy)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    _pages[index]['title']!.toUpperCase(),
+                                    style: AppTypography.h1.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 28,
+                                      height: 1.2,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: AppSpacing.md),
-                                Text(
-                                  _pages[index]['description']!,
-                                  style: AppTypography.bodyLarge.copyWith(
-                                    color: Colors.white.withAlpha(220),
-                                    fontSize: 16,
-                                    height: 1.4,
+                                  const SizedBox(height: AppSpacing.md),
+                                  Text(
+                                    _pages[index]['description']!,
+                                    style: AppTypography.bodyLarge.copyWith(
+                                      color: Colors.white.withAlpha(220),
+                                      fontSize: 16,
+                                      height: 1.4,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 50),
-                        ],
-                      ),
+                            const SizedBox(height: 30),
+                          ],
+                        ),
+                      ),,
                     ],
                   );
                 },
