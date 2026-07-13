@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants/app_spacing.dart';
 import '../../core/theme/app_colors.dart';
@@ -13,12 +14,15 @@ import 'widgets/achievement_card.dart';
 import 'widgets/recommendation_card.dart';
 import 'widgets/progress_comparison_card.dart';
 import '../../widgets/navigation.dart';
+import '../../providers/report_provider.dart';
 
-class MonthlyReportScreen extends StatelessWidget {
+class MonthlyReportScreen extends ConsumerWidget {
   const MonthlyReportScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final reportAsync = ref.watch(monthlyReportProvider);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -32,37 +36,89 @@ class MonthlyReportScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const SizedBox(height: AppSpacing.sm),
-            Text('Your health performance over the last 30 days.', style: AppTypography.bodyLarge.copyWith(color: AppColors.textSecondary)),
+            Text('Your health performance over the last 30 days.',
+                style: AppTypography.bodyLarge
+                    .copyWith(color: AppColors.textSecondary)),
             const SizedBox(height: AppSpacing.lg),
+
+            // Live stats from backend
+            reportAsync.when(
+              loading: () => const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(AppSpacing.xl),
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+              error: (e, _) => Container(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.orange),
+                ),
+                child: Text(
+                  'Could not load monthly report. Showing static preview.',
+                  style: TextStyle(color: Colors.orange.shade800),
+                ),
+              ),
+              data: (report) => Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SectionHeader(title: 'Monthly Statistics'),
+                  GridView.count(
+                    crossAxisCount: 2,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    mainAxisSpacing: AppSpacing.md,
+                    crossAxisSpacing: AppSpacing.md,
+                    childAspectRatio: 1.5,
+                    children: [
+                      StatCard(
+                          title: 'Active Medicines',
+                          value: '${report.activeMedicines}',
+                          icon: Icons.medication),
+                      StatCard(
+                          title: 'Health Logs',
+                          value: '${report.healthLogsRecorded}',
+                          icon: Icons.favorite),
+                      StatCard(
+                          title: 'Avg Blood Sugar',
+                          value: report.sugarDisplay,
+                          icon: Icons.water_drop),
+                      StatCard(
+                          title: 'Avg Weight',
+                          value: report.weightDisplay,
+                          icon: Icons.monitor_weight),
+                      StatCard(
+                          title: 'Avg Sleep',
+                          value: report.sleepDisplay,
+                          icon: Icons.bedtime),
+                      StatCard(
+                          title: 'Upcoming Appts',
+                          value: '${report.upcomingAppointments}',
+                          icon: Icons.calendar_today),
+                      StatCard(
+                          title: 'SOS Triggers',
+                          value: '${report.sosTriggers}',
+                          icon: Icons.sos),
+                      StatCard(
+                          title: 'Period',
+                          value: '${report.periodDays} Days',
+                          icon: Icons.date_range),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
+                ],
+              ),
+            ),
 
             // Section 1: Monthly Health Score
             const SectionHeader(title: 'Monthly Health Score'),
             const HealthScoreCard(
               score: '91 / 100',
               status: 'Excellent Progress',
-              description: '"Your health has consistently improved throughout this month."',
-            ),
-            const SizedBox(height: AppSpacing.xl),
-
-            // Section 2: Monthly Statistics
-            const SectionHeader(title: 'Monthly Statistics'),
-            GridView.count(
-              crossAxisCount: 2,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: AppSpacing.md,
-              crossAxisSpacing: AppSpacing.md,
-              childAspectRatio: 1.5,
-              children: const [
-                StatCard(title: 'Average Heart Rate', value: '74 BPM', icon: Icons.favorite),
-                StatCard(title: 'Avg Blood Pressure', value: '120 / 78', icon: Icons.monitor_heart),
-                StatCard(title: 'Avg Blood Sugar', value: '104 mg/dL', icon: Icons.water_drop),
-                StatCard(title: 'Avg Daily Steps', value: '8,420', icon: Icons.directions_walk),
-                StatCard(title: 'Medicine Adherence', value: '96%', icon: Icons.medication),
-                StatCard(title: 'Calories Burned', value: '8,950 kcal', icon: Icons.local_fire_department),
-                StatCard(title: 'Average Sleep', value: '7.5 Hours', icon: Icons.bedtime),
-                StatCard(title: 'Water Intake', value: '2.3 Litres', icon: Icons.local_drink),
-              ],
+              description:
+                  '"Your health has consistently improved throughout this month."',
             ),
             const SizedBox(height: AppSpacing.xl),
 
@@ -88,20 +144,14 @@ class MonthlyReportScreen extends StatelessWidget {
               icon: Icons.arrow_upward,
               statusColor: AppColors.success,
             ),
-            const SizedBox(height: AppSpacing.sm),
-            const ProgressComparisonCard(
-              title: 'Weight',
-              status: 'Reduced by 1.4 kg',
-              icon: Icons.arrow_downward,
-              statusColor: AppColors.success,
-            ),
             const SizedBox(height: AppSpacing.xl),
 
             // Section 4: Monthly AI Summary
             const SectionHeader(title: 'Monthly AI Summary'),
             const InformationCard(
               title: 'AI Summary',
-              description: 'This month you maintained excellent medication adherence, increased your daily activity, and showed stable blood pressure readings. Continue your current routine for even better long-term health.',
+              description:
+                  'This month you maintained excellent medication adherence, increased your daily activity, and showed stable blood pressure readings. Continue your current routine for even better long-term health.',
             ),
             const SizedBox(height: AppSpacing.xl),
 
@@ -114,8 +164,6 @@ class MonthlyReportScreen extends StatelessWidget {
             const AchievementCard(title: 'Healthy Blood Pressure'),
             const SizedBox(height: AppSpacing.sm),
             const AchievementCard(title: 'Hydration Maintained'),
-            const SizedBox(height: AppSpacing.sm),
-            const AchievementCard(title: 'Active Lifestyle'),
             const SizedBox(height: AppSpacing.xl),
 
             // Section 6: AI Recommendations
@@ -126,14 +174,19 @@ class MonthlyReportScreen extends StatelessWidget {
             const SizedBox(height: AppSpacing.sm),
             const RecommendationCard(text: 'Continue your walking habit.'),
             const SizedBox(height: AppSpacing.sm),
-            const RecommendationCard(text: 'Schedule your monthly doctor check-up.'),
+            const RecommendationCard(
+                text: 'Schedule your monthly doctor check-up.'),
             const SizedBox(height: AppSpacing.xl),
 
             // Bottom Actions
-            PrimaryButton(text: 'Generate Doctor Summary', onPressed: () => context.push('/doctor-summary')),
+            PrimaryButton(
+                text: 'Generate Doctor Summary',
+                onPressed: () => context.push('/doctor-summary')),
             const SizedBox(height: AppSpacing.md),
-            SecondaryButton(text: 'Back to Weekly Report', onPressed: () => context.pop()),
-            
+            SecondaryButton(
+                text: 'Back to Weekly Report',
+                onPressed: () => context.pop()),
+
             const SizedBox(height: AppSpacing.xxl),
           ],
         ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants/app_spacing.dart';
 import '../../core/theme/app_colors.dart';
@@ -12,12 +13,15 @@ import 'widgets/health_score_card.dart';
 import 'widgets/achievement_card.dart';
 import 'widgets/recommendation_card.dart';
 import '../../widgets/navigation.dart';
+import '../../providers/report_provider.dart';
 
-class WeeklyReportScreen extends StatelessWidget {
+class WeeklyReportScreen extends ConsumerWidget {
   const WeeklyReportScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final reportAsync = ref.watch(weeklyReportProvider);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -31,10 +35,75 @@ class WeeklyReportScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const SizedBox(height: AppSpacing.sm),
-            Text('Health summary for the last 7 days.', style: AppTypography.bodyLarge.copyWith(color: AppColors.textSecondary)),
+            Text('Health summary for the last 7 days.',
+                style: AppTypography.bodyLarge
+                    .copyWith(color: AppColors.textSecondary)),
             const SizedBox(height: AppSpacing.lg),
 
-            // Section 1: Overall Health Score
+            // Live stats from backend
+            reportAsync.when(
+              loading: () => const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(AppSpacing.xl),
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+              error: (e, _) => Container(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.orange),
+                ),
+                child: Text(
+                  'Could not load report data. Showing static preview.',
+                  style: TextStyle(color: Colors.orange.shade800),
+                ),
+              ),
+              data: (report) => Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SectionHeader(title: 'Weekly Statistics'),
+                  GridView.count(
+                    crossAxisCount: 2,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    mainAxisSpacing: AppSpacing.md,
+                    crossAxisSpacing: AppSpacing.md,
+                    childAspectRatio: 1.5,
+                    children: [
+                      StatCard(
+                          title: 'Active Medicines',
+                          value: '${report.activeMedicines}',
+                          icon: Icons.medication),
+                      StatCard(
+                          title: 'Health Logs',
+                          value: '${report.healthLogsRecorded}',
+                          icon: Icons.favorite),
+                      StatCard(
+                          title: 'Avg Blood Sugar',
+                          value: report.sugarDisplay,
+                          icon: Icons.water_drop),
+                      StatCard(
+                          title: 'Avg Weight',
+                          value: report.weightDisplay,
+                          icon: Icons.monitor_weight),
+                      StatCard(
+                          title: 'Avg Sleep',
+                          value: report.sleepDisplay,
+                          icon: Icons.bedtime),
+                      StatCard(
+                          title: 'SOS Triggers',
+                          value: '${report.sosTriggers}',
+                          icon: Icons.sos),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
+                ],
+              ),
+            ),
+
+            // Section 1: Overall Health Score (static)
             const SectionHeader(title: 'Overall Health Score'),
             const HealthScoreCard(
               score: '87 / 100',
@@ -43,31 +112,12 @@ class WeeklyReportScreen extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.xl),
 
-            // Section 2: Weekly Statistics
-            const SectionHeader(title: 'Weekly Statistics'),
-            GridView.count(
-              crossAxisCount: 2,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: AppSpacing.md,
-              crossAxisSpacing: AppSpacing.md,
-              childAspectRatio: 1.5,
-              children: const [
-                StatCard(title: 'Average Heart Rate', value: '76 BPM', icon: Icons.favorite),
-                StatCard(title: 'Avg Blood Pressure', value: '122 / 80', icon: Icons.monitor_heart),
-                StatCard(title: 'Avg Blood Sugar', value: '108 mg/dL', icon: Icons.water_drop),
-                StatCard(title: 'Avg Daily Steps', value: '7,850', icon: Icons.directions_walk),
-                StatCard(title: 'Medicine Adherence', value: '94%', icon: Icons.medication),
-                StatCard(title: 'Calories Burned', value: '1,980 kcal', icon: Icons.local_fire_department),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.xl),
-
             // Section 3: Weekly Health Summary
             const SectionHeader(title: 'Weekly Health Summary'),
             const InformationCard(
               title: 'AI Summary',
-              description: 'This week you maintained good medication adherence and consistent daily activity. Your blood pressure remained stable throughout the week. Continue following your current routine.',
+              description:
+                  'This week you maintained good medication adherence and consistent daily activity. Your blood pressure remained stable throughout the week. Continue following your current routine.',
             ),
             const SizedBox(height: AppSpacing.xl),
 
@@ -94,10 +144,13 @@ class WeeklyReportScreen extends StatelessWidget {
             const SizedBox(height: AppSpacing.xl),
 
             // Bottom Actions
-            PrimaryButton(text: 'View Monthly Report', onPressed: () => context.push('/monthly-report')),
+            PrimaryButton(
+                text: 'View Monthly Report',
+                onPressed: () => context.push('/monthly-report')),
             const SizedBox(height: AppSpacing.md),
-            SecondaryButton(text: 'Back to Reports', onPressed: () => context.pop()),
-            
+            SecondaryButton(
+                text: 'Back to Reports', onPressed: () => context.pop()),
+
             const SizedBox(height: AppSpacing.xxl),
           ],
         ),

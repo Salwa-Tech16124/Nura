@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants/app_spacing.dart';
 import '../../core/theme/app_colors.dart';
@@ -8,15 +9,17 @@ import '../../widgets/cards.dart';
 import '../../widgets/navigation.dart';
 import '../../widgets/buttons.dart';
 import '../../widgets/misc.dart';
+import '../../providers/auth_provider.dart';
 
-class HomeDashboardScreen extends StatefulWidget {
+class HomeDashboardScreen extends ConsumerStatefulWidget {
   const HomeDashboardScreen({super.key});
 
   @override
-  State<HomeDashboardScreen> createState() => _HomeDashboardScreenState();
+  ConsumerState<HomeDashboardScreen> createState() =>
+      _HomeDashboardScreenState();
 }
 
-class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
+class _HomeDashboardScreenState extends ConsumerState<HomeDashboardScreen> {
   int _selectedMoodIndex = 2; // Default to "Calm"
 
   @override
@@ -62,7 +65,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Sarah Jenkins',
+                              ref.watch(currentUserProvider)?.name ?? 'Welcome!',
                               style: AppTypography.h3.copyWith(
                                 color: const Color(0xFF1E244A),
                                 fontWeight: FontWeight.w900,

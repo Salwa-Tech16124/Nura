@@ -4,6 +4,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/constants/app_spacing.dart';
 import '../../core/services/audio_service.dart';
+import '../../services/api_client.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -12,25 +13,34 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(duration: const Duration(seconds: 2), vsync: this);
+    _controller =
+        AnimationController(duration: const Duration(seconds: 2), vsync: this);
     _animation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
-    
     _controller.forward();
 
     // Play the startup sound once
     AudioService().playStartupSound();
 
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
-        // Stop sound when navigating away
-        AudioService().stop();
+    Future.delayed(const Duration(seconds: 3), () async {
+      if (!mounted) return;
+      AudioService().stop();
+
+      // ── Auth Guard ────────────────────────────────────────────────────────
+      // If the user has a stored token, go straight to the home dashboard.
+      // Otherwise, show onboarding.
+      final isLoggedIn = await ApiClient.hasToken();
+      if (!mounted) return;
+      if (isLoggedIn) {
+        context.go('/home');
+      } else {
         context.go('/onboarding');
       }
     });

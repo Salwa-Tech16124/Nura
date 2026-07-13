@@ -1,19 +1,73 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/constants/app_spacing.dart';
 import '../../widgets/layout/page_container.dart';
+import '../../providers/auth_provider.dart';
+import '../../services/api_client.dart';
 import '../onboarding/onboarding_screen.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends ConsumerState<LoginScreen> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _isLoading = false;
+  bool _rememberMe = false;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _login() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      _showError('Please enter your email and password.');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final authService = ref.read(authServiceProvider);
+      final user = await authService.login(email, password);
+      ref.read(authNotifierProvider.notifier).setUser(user);
+      if (mounted) context.go('/home');
+    } catch (e) {
+      if (mounted) _showError(ApiClient.extractError(e));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: const Color(0xFFEC407A),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF131124), // Premium dark theme body
+      backgroundColor: const Color(0xFF131124),
       body: PageContainer(
-        padding: EdgeInsets.zero, // Zero padding to allow header waves to touch the sides
+        padding: EdgeInsets.zero,
         child: ScrollablePageLayout(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -23,61 +77,37 @@ class LoginScreen extends StatelessWidget {
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  // Wavy background region
-                  Positioned.fill(
-                    child: CustomPaint(
-                      painter: LoginWavePainter(),
-                    ),
-                  ),
-                  // Background cloud emoji outlines
+                  Positioned.fill(child: CustomPaint(painter: LoginWavePainter())),
                   Positioned(
-                    left: 40,
-                    top: 25,
-                    child: Icon(
-                      Icons.wb_cloudy_outlined,
-                      size: 32,
-                      color: Colors.white.withAlpha(20),
-                    ),
+                    left: 40, top: 25,
+                    child: Icon(Icons.wb_cloudy_outlined, size: 32,
+                        color: Colors.white.withAlpha(20)),
                   ),
                   Positioned(
-                    right: 50,
-                    top: 35,
-                    child: Icon(
-                      Icons.cloud_outlined,
-                      size: 26,
-                      color: Colors.white.withAlpha(16),
-                    ),
+                    right: 50, top: 35,
+                    child: Icon(Icons.cloud_outlined, size: 26,
+                        color: Colors.white.withAlpha(16)),
                   ),
                   Positioned(
-                    left: 150,
-                    top: 45,
-                    child: Icon(
-                      Icons.bubble_chart_outlined,
-                      size: 20,
-                      color: Colors.white.withAlpha(18),
-                    ),
+                    left: 150, top: 45,
+                    child: Icon(Icons.bubble_chart_outlined, size: 20,
+                        color: Colors.white.withAlpha(18)),
                   ),
-                  // Centered cartoon face
                   Positioned(
-                    top: 100,
-                    left: 0,
-                    right: 0,
-                    child: Center(
-                      child: CartoonFace(pageIndex: 2), // Matching the cute teeth-smile face!
-                    ),
+                    top: 100, left: 0, right: 0,
+                    child: Center(child: CartoonFace(pageIndex: 2)),
                   ),
                 ],
               ),
             ),
 
-            // Form container section
+            // Form
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: AppSpacing.lg),
-                  // Titles
                   Text(
                     'WELCOME BACK!',
                     style: AppTypography.h1.copyWith(
@@ -97,16 +127,18 @@ class LoginScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: AppSpacing.xxl),
 
-                  // Inputs
-                  const DarkTextField(
+                  DarkTextField(
                     hintText: 'Email Address',
                     prefixIcon: Icons.email_outlined,
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  const DarkTextField(
+                  DarkTextField(
                     hintText: 'Password',
                     obscureText: true,
                     prefixIcon: Icons.lock_outline,
+                    controller: _passwordController,
                   ),
                   const SizedBox(height: AppSpacing.sm),
 
@@ -117,47 +149,41 @@ class LoginScreen extends StatelessWidget {
                       Row(
                         children: [
                           Theme(
-                            data: ThemeData(
-                              unselectedWidgetColor: Colors.white54,
-                            ),
+                            data: ThemeData(unselectedWidgetColor: Colors.white54),
                             child: Checkbox(
-                              value: false,
-                              onChanged: (v) {},
+                              value: _rememberMe,
+                              onChanged: (v) =>
+                                  setState(() => _rememberMe = v ?? false),
                               activeColor: const Color(0xFFEC407A),
-                              side: const BorderSide(color: Colors.white38, width: 1.5),
+                              side: const BorderSide(
+                                  color: Colors.white38, width: 1.5),
                             ),
                           ),
-                          Text(
-                            'Remember Me',
-                            style: AppTypography.bodyMedium.copyWith(color: Colors.white.withAlpha(200)),
-                          ),
+                          Text('Remember Me',
+                              style: AppTypography.bodyMedium.copyWith(
+                                  color: Colors.white.withAlpha(200))),
                         ],
                       ),
                       TextButton(
                         onPressed: () {},
-                        child: Text(
-                          'Forgot Password?',
-                          style: AppTypography.bodyMedium.copyWith(
-                            color: const Color(0xFFEC407A),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        child: Text('Forgot Password?',
+                            style: AppTypography.bodyMedium.copyWith(
+                                color: const Color(0xFFEC407A),
+                                fontWeight: FontWeight.bold)),
                       ),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.xl),
 
-                  // Gradient button
+                  // Login button
                   Container(
                     width: double.infinity,
                     height: 52,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.radiusPill),
                       gradient: const LinearGradient(
-                        colors: [
-                          Color(0xFF7E57C2), // Indigo purple
-                          Color(0xFFEC407A), // Vibrant Pink/Magenta
-                        ],
+                        colors: [Color(0xFF7E57C2), Color(0xFFEC407A)],
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
                       ),
@@ -174,40 +200,43 @@ class LoginScreen extends StatelessWidget {
                         backgroundColor: Colors.transparent,
                         shadowColor: Colors.transparent,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+                          borderRadius:
+                              BorderRadius.circular(AppSpacing.radiusPill),
                         ),
                       ),
-                      onPressed: () => context.go('/home'),
-                      child: const Text(
-                        'Sign in',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
+                      onPressed: _isLoading ? null : _login,
+                      child: _isLoading
+                          ? const SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(
+                                  color: Colors.white, strokeWidth: 2.5),
+                            )
+                          : const Text(
+                              'Sign in',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.5),
+                            ),
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
 
-                  // Bottom signup link
+                  // Signup link
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        "Don't have an account?",
-                        style: AppTypography.bodyMedium.copyWith(color: Colors.white.withAlpha(150)),
-                      ),
+                      Text("Don't have an account?",
+                          style: AppTypography.bodyMedium
+                              .copyWith(color: Colors.white.withAlpha(150))),
                       TextButton(
                         onPressed: () => context.go('/register'),
-                        child: const Text(
-                          'Sign Up',
-                          style: TextStyle(
-                            color: Color(0xFFEC407A),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        child: const Text('Sign Up',
+                            style: TextStyle(
+                                color: Color(0xFFEC407A),
+                                fontWeight: FontWeight.bold)),
                       ),
                     ],
                   ),
@@ -221,14 +250,13 @@ class LoginScreen extends StatelessWidget {
   }
 }
 
-// ----------------------------------------------------------------------
-// Custom Text Field for Dark Mode Form inputs
-// ----------------------------------------------------------------------
+// ── Dark Text Field ──────────────────────────────────────────────────────────
 class DarkTextField extends StatelessWidget {
   final String hintText;
   final TextEditingController? controller;
   final bool obscureText;
   final IconData prefixIcon;
+  final TextInputType? keyboardType;
 
   const DarkTextField({
     super.key,
@@ -236,6 +264,7 @@ class DarkTextField extends StatelessWidget {
     this.controller,
     this.obscureText = false,
     required this.prefixIcon,
+    this.keyboardType,
   });
 
   @override
@@ -243,6 +272,7 @@ class DarkTextField extends StatelessWidget {
     return TextField(
       controller: controller,
       obscureText: obscureText,
+      keyboardType: keyboardType,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         hintText: hintText,
@@ -250,7 +280,8 @@ class DarkTextField extends StatelessWidget {
         prefixIcon: Icon(prefixIcon, color: Colors.white54, size: 20),
         filled: true,
         fillColor: Colors.white.withAlpha(12),
-        contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+        contentPadding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg, vertical: AppSpacing.md),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
           borderSide: BorderSide(color: Colors.white.withAlpha(20)),
@@ -268,17 +299,13 @@ class DarkTextField extends StatelessWidget {
   }
 }
 
-// ----------------------------------------------------------------------
-// Painter for Login top wave background
-// ----------------------------------------------------------------------
+// ── Wave Painter ─────────────────────────────────────────────────────────────
 class LoginWavePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    // Top background region (pastel wine red background behind character)
     final bgPaint = Paint()..color = const Color(0xFF2C1E3F);
     canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), bgPaint);
 
-    // Wave color (dark body color: const Color(0xFF131124))
     final wavePaint = Paint()
       ..color = const Color(0xFF131124)
       ..style = PaintingStyle.fill;
@@ -286,15 +313,12 @@ class LoginWavePainter extends CustomPainter {
     final path = Path();
     path.moveTo(0, size.height);
     path.lineTo(size.width, size.height);
-
-    double startY = 190;
+    const startY = 190.0;
     path.lineTo(size.width, startY);
-
-    double w = size.width;
+    final w = size.width;
     path.quadraticBezierTo(w * 0.85, startY - 35, w * 0.7, startY - 10);
     path.quadraticBezierTo(w * 0.5, startY - 55, w * 0.3, startY - 10);
     path.quadraticBezierTo(w * 0.15, startY - 35, 0, startY);
-
     path.close();
     canvas.drawPath(path, wavePaint);
   }
