@@ -5,7 +5,16 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+_client = None
+
+def _get_client():
+    global _client
+    if _client is None:
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            api_key = "DUMMY_GEMINI_API_KEY"
+        _client = genai.Client(api_key=api_key)
+    return _client
 
 def analyze_medicine_photo(image_bytes: bytes, user_age: int | None) -> str:
     age_context = f"The user is {user_age} years old." if user_age else "The user's age is unknown."
@@ -22,8 +31,8 @@ Provide:
 
 Keep it concise. Always end by reminding the user to confirm with a doctor or pharmacist before taking anything — this is guidance, not a prescription."""
 
-    response = client.models.generate_content(
-       model="gemini-flash-latest",
+    response = _get_client().models.generate_content(
+        model="gemini-flash-latest",
         contents=[
             types.Part.from_bytes(data=image_bytes, mime_type="image/jpeg"),
             prompt
@@ -50,7 +59,7 @@ Extract the information and respond with ONLY a valid JSON object (no markdown, 
 
 If a field can't be determined, use null. Do not guess medical values you can't clearly read."""
 
-    response = client.models.generate_content(
+    response = _get_client().models.generate_content(
         model="gemini-flash-latest",
         contents=[
             types.Part.from_bytes(data=file_bytes, mime_type=mime_type),
@@ -85,8 +94,8 @@ USER QUESTION:
 
 Answer clearly and concisely. Always remind the user to consult a doctor for medical decisions, not just rely on this summary."""
 
-    response = client.models.generate_content(
-       model="gemini-flash-latest",
+    response = _get_client().models.generate_content(
+        model="gemini-flash-latest",
         contents=[prompt]
     )
     return response.text
