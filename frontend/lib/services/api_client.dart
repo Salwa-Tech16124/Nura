@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../constants/api_constants.dart';
+import '../core/constants/api_constants.dart';
 
 /// Singleton Dio HTTP client with JWT auth interceptor.
 /// All services use this client to make authenticated requests.
