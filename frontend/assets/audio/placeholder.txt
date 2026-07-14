@@ -1,1 +1,0 @@
-Placeholder file to create the assets/audio/ directory. Place startup.mp3 in this folder.
